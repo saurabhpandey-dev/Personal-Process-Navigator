@@ -10,8 +10,33 @@
 <body>
 
     <!-- Common Navbar -->
-    <header>
-        
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">&#9875;</span>
+                <span>Process<strong>Navigator</strong></span>
+            </a>
+            
+            <nav class="nav-menu" id="navMenu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/#processes" class="nav-link">Processes</a>
+                <a href="/#how-it-works" class="nav-link">How It Works</a>
+                <a href="/#features" class="nav-link">Features</a>
+                <div class="nav-actions-mobile">
+                    <a href="/dashboard" class="btn btn-secondary">Login</a>
+                    <a href="/dashboard" class="btn btn-primary">Get Started</a>
+                </div>
+            </nav>
+
+            <div class="nav-actions-desktop">
+                <a href="/dashboard" class="btn btn-text">Login</a>
+                <a href="/dashboard" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+
+            <button class="mobile-menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+                &#9776;
+            </button>
+        </div>
     </header>
 
     <!-- Main Content Injection -->

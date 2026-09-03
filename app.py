@@ -20,9 +20,16 @@ def login():
 def register():
     return render_template('register.html')
 
+# this route for calling the process page
 @app.route('/process')
 def process():
     return render_template('process.html')
+
+# this route for calling the process details page
+@app.route('/process_detail')
+def process_detail():
+    return render_template('process_details.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True) 

@@ -19,5 +19,10 @@ def login():
 @app.route('/register')
 def register():
     return render_template('register.html')
+
+@app.route('/process')
+def process():
+    return render_template('process.html')
+
 if __name__ == '__main__':
     app.run(debug=True) 

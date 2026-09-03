@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block title %}Register - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container auth-container">
+        <div class="auth-card-wrapper">
+            <div class="card auth-form-card">
+                <div class="auth-header">
+                    <h2>Create Account</h2>
+                    <p>Start your streamlined application and verification journey today.</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" name="fullname" class="form-control" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="form-control" placeholder="+91 98765 43210" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Create a strong password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="terms" required> I agree to the <a href="#" class="text-link">Terms of Service</a> and <a href="#" class="text-link">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full mt-3">Create Account</button>
+                </form>
+
+                <div class="auth-footer-text">
+                    <p>Already have an account? <a href="{{ url_for('login') }}" class="text-accent font-semibold">Login here</a></p>
+                </div>
+            </div>
+
+            <div class="auth-visual-side">
+                <div class="visual-card-content">
+                    <span class="badge-pill">Join Process Navigator</span>
+                    <h3>Effortless Administrative Workflows</h3>
+                    <p>Designed specifically for students and entrepreneurs to eliminate bureaucracy, verify records accurately, and track progress.</p>
+                    <div class="mockup-card mt-4">
+                        <div class="card-icon-title">
+                            <span class="icon-box text-accent">&#128203;</span>
+                            <div>
+                                <h4>Instant Onboarding</h4>
+                                <p>Setup your profile in seconds</p>
+                            </div>
+                        </div>
+                        <span class="status-badge success">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

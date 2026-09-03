@@ -1,0 +1,13 @@
+-- database: ./data.db
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+CREATE TABLE USER(
+    user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT not null,
+    email TEXT not null,
+    number TEXT not null,
+    password TEXT NOT NULL,
+    create_date DEFAULT CURRENT_TIMESTAMP
+)
+

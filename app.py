@@ -30,6 +30,10 @@ def process():
 def process_detail():
     return render_template('process_details.html')
 
+# this route for calling the upload page
+@app.route('/upload')
+def upload():
+    return render_template('upload.html')
 
 if __name__ == '__main__':
     app.run(debug=True) 

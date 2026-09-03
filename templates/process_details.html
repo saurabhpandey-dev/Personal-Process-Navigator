@@ -1,0 +1,140 @@
+{% extends "layout.html" %}
+{% block title %}Education Loan Details - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<section class="process-detail-section">
+    <div class="container">
+        <!-- Breadcrumb & Header -->
+        <div class="detail-header-wrapper">
+            <div>
+                <a href="/process" class="text-link text-muted mb-2 inline-block">&larr; Back to Processes</a>
+                <span class="badge-pill">Education Loan Workflow</span>
+                <h1>Education Loan Process Guidance</h1>
+                <p>Review the exact required documents and step-by-step milestone protocol to ensure error-free bank submission.</p>
+            </div>
+            <div class="detail-action-box">
+                <a href="/upload" class="btn btn-primary btn-lg">Upload First Document &rarr;</a>
+            </div>
+        </div>
+
+        <div class="detail-content-grid mt-4">
+            <!-- Left Column: Checklist & Steps -->
+            <div class="space-y">
+                <!-- Required Documents Checklist -->
+                <div class="card">
+                    <h3>&#128194; Required Documents Checklist</h3>
+                    <p class="text-muted text-sm mb-3">Ensure you have digital copies ready in PDF, JPG, or PNG format.</p>
+                    <ul class="checklist-items">
+                        <li>
+                            <label class="checklist-label">
+                                <input type="checkbox" checked disabled> 
+                                <span>Aadhaar Card <small class="text-muted">(Identity Proof)</small></span>
+                            </label>
+                            <span class="badge-status success">Mandatory</span>
+                        </li>
+                        <li>
+                            <label class="checklist-label">
+                                <input type="checkbox" checked disabled> 
+                                <span>PAN Card <small class="text-muted">(Tax Reference)</small></span>
+                            </label>
+                            <span class="badge-status success">Mandatory</span>
+                        </li>
+                        <li>
+                            <label class="checklist-label">
+                                <input type="checkbox"> 
+                                <span>Income Certificate <small class="text-muted">(Issued by competent authority)</small></span>
+                            </label>
+                            <span class="badge-status success">Mandatory</span>
+                        </li>
+                        <li>
+                            <label class="checklist-label">
+                                <input type="checkbox"> 
+                                <span>Marksheet <small class="text-muted">(Academic transcripts)</small></span>
+                            </label>
+                            <span class="badge-status success">Mandatory</span>
+                        </li>
+                        <li>
+                            <label class="checklist-label">
+                                <input type="checkbox"> 
+                                <span>Bank Statement <small class="text-muted">(Last 6 months)</small></span>
+                            </label>
+                            <span class="badge-status success">Mandatory</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Step-by-Step Timeline -->
+                <div class="card">
+                    <h3>&#128200; Step-by-Step Process Timeline</h3>
+                    <div class="timeline-container mt-4">
+                        <div class="timeline-step completed">
+                            <span class="timeline-marker">01</span>
+                            <div class="timeline-info">
+                                <strong>Eligibility Check</strong>
+                                <p>Verify course accreditation, university ranking, and loan quantum limits.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step completed">
+                            <span class="timeline-marker">02</span>
+                            <div class="timeline-info">
+                                <strong>Document Collection</strong>
+                                <p>Gather identity proofs, academic certificates, and income certificates.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step current">
+                            <span class="timeline-marker">03</span>
+                            <div class="timeline-info">
+                                <strong>Document Verification</strong>
+                                <p>Run OCR scan and automated consistency checks to detect discrepancies.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <span class="timeline-marker">04</span>
+                            <div class="timeline-info">
+                                <strong>Application Preparation</strong>
+                                <p>Compile verified files into a unified loan dossier.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <span class="timeline-marker">05</span>
+                            <div class="timeline-info">
+                                <strong>Application Submission</strong>
+                                <p>Submit formal package to partner financial institution.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step">
+                            <span class="timeline-marker">06</span>
+                            <div class="timeline-info">
+                                <strong>Process Completion</strong>
+                                <p>Sanction letter issuance and disbursement scheduling.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Important Notes & Actions -->
+            <div class="space-y">
+                <div class="card alert-highlight-card">
+                    <div class="alert-icon-header">
+                        <span class="text-accent">&#9432;</span>
+                        <h3>Important Notes</h3>
+                    </div>
+                    <ul class="notes-list">
+                        <li>Ensure all scanned certificates are clear and completely legible (minimum 300 DPI recommended).</li>
+                        <li>Name spelling across Aadhaar, PAN, and Academic Marksheets must match precisely.</li>
+                        <li>Income certificates should not be older than 6 months from the date of submission.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Ready to proceed?</h3>
+                    <p class="text-muted text-sm mb-4">Upload your documents one by one to begin automated validation.</p>
+                    <a href="/upload" class="btn btn-primary btn-full">Proceed to Upload &rarr;</a>
+                    <a href="/tracking" class="btn btn-outline btn-full mt-3">View Active Tracking</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,6 +1,10 @@
 from flask import Flask, render_template,request
+from cs50 import SQL
+import os
 
 app = Flask(__name__)
+db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.db")  # this line for get the path from anywhere
+
 
 @app.route('/')
 def index():

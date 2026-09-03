@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block title %}Upload Document - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<section class="upload-page-section">
+    <div class="container upload-container">
+        <div class="section-header text-center">
+            <span class="badge-pill">Secure Vault Upload</span>
+            <h2>Upload Your Document</h2>
+            <p>Upload digital copies of your certificates for instant OCR verification.</p>
+        </div>
+
+        <div class="card upload-card-box">
+            <div class="upload-meta-bar">
+                <div>
+                    <span class="text-muted text-xs">Active Process</span>
+                    <h4>Education Loan</h4>
+                </div>
+                <div>
+                    <span class="text-muted text-xs">Document Type</span>
+                    <h4 class="text-accent">Income Certificate</h4>
+                </div>
+                <div>
+                    <span class="badge-status success">Required</span>
+                </div>
+            </div>
+
+            <form method="POST" action="/verification" enctype="multipart/form-data" class="upload-form mt-4" id="uploadForm">
+                <div class="dropzone-area" id="dropZone">
+                    <div class="dropzone-content" id="dropContent">
+                        <span class="upload-icon">&#128194;</span>
+                        <h4>Drag and drop your document here</h4>
+                        <p>Supports: PDF, JPG, JPEG, PNG (Max file size: 10MB)</p>
+                        <label for="fileInput" class="btn btn-outline btn-sm mt-3">Browse Files</label>
+                    </div>
+                    <input type="file" id="fileInput" name="document" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    
+                    <!-- File Preview State (Hidden by default) -->
+                    <div class="file-preview-box" id="filePreview" style="display: none;">
+                        <span class="file-type-icon">&#128196;</span>
+                        <div class="file-info-text">
+                            <strong id="fileNameDisplay">document_scan.pdf</strong>
+                            <span id="fileSizeDisplay">2.4 MB • Ready for verification</span>
+                        </div>
+                        <button type="button" class="btn btn-text text-danger" id="removeFileBtn">Remove</button>
+                    </div>
+                </div>
+
+                <div class="form-actions mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg btn-full" id="submitUploadBtn" disabled>Upload & Verify Document</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

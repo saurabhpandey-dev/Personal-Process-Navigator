@@ -4,7 +4,8 @@ import os
 
 app = Flask(__name__)
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.db")  # this line for get the path from anywhere
-
+ 
+db = SQL(f'sqlite:///{db_path}')  # database add command
 
 @app.route('/')
 def index():

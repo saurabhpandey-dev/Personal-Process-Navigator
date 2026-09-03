@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block title %}Login - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container auth-container">
+        <div class="auth-card-wrapper">
+            <div class="card auth-form-card">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Enter your credentials to access your workspace.</p>
+                </div>
+                
+                <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-field-wrapper">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password-btn" id="togglePassword">&#128065;</button>
+                        </div>
+                    </div>
+
+                    <div class="form-row-between">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember"> Remember me
+                        </label>
+                        <a href="#" class="text-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full mt-4">Login</button>
+                </form>
+
+                <div class="auth-footer-text">
+                    <p>Don't have an account? <a href="{{ url_for('register') }}" class="text-accent font-semibold">Register here</a></p>
+                </div>
+            </div>
+
+            <div class="auth-visual-side">
+                <div class="visual-card-content">
+                    <span class="badge-pill">Secure Workspace</span>
+                    <h3>Smart Verification & Process Tracking</h3>
+                    <p>Manage all your official documentation, track status milestones, and clear compliance bottlenecks seamlessly.</p>
+                    <ul class="visual-bullet-list">
+                        <li>&#10003; Automated document validation checks</li>
+                        <li>&#10003; Step-by-step progress roadmap</li>
+                        <li>&#10003; Instant AI correction guidance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

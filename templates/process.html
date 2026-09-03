@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block title %}Choose Your Process - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<section class="processes-page-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Choose Your Process</h2>
+            <p>Select a process and let Process Navigator guide you through the requirements and steps.</p>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="process-filter-bar">
+            <div class="search-input-wrapper">
+                <span class="search-icon">&#128269;</span>
+                <input type="text" id="processSearch" class="form-control" placeholder="Search processes (e.g., Education Loan, GST)...">
+            </div>
+            <div class="filter-pills">
+                <button class="filter-btn active" data-filter="all">All Processes</button>
+                <button class="filter-btn" data-filter="student">Student</button>
+                <button class="filter-btn" data-filter="business">Business</button>
+            </div>
+        </div>
+
+        <!-- Process Cards Grid -->
+        <div class="process-grid mt-4" id="processGrid">
+            <!-- Education Loan -->
+            <div class="process-card" data-category="student" data-name="education loan">
+                <div class="process-icon bg-blue-soft">&#127891;</div>
+                <h3>Education Loan</h3>
+                <p>Complete documentation checklist and bank verification guidance for domestic & international studies.</p>
+                <div class="process-meta-info">
+                    <div class="doc-count">&#128194; 5 Required Documents</div>
+                    <div class="step-count">&#8985; 6 Steps</div>
+                </div>
+                <a href="/process_detail" class="btn btn-outline btn-full mt-3">Start Process</a>
+            </div>
+
+            <!-- Scholarship -->
+            <div class="process-card" data-category="student" data-name="scholarship">
+                <div class="process-icon bg-cyan-soft">&#127942;</div>
+                <h3>Scholarship</h3>
+                <p>Navigate merit and need-based government or private scholarship applications effortlessly.</p>
+                <div class="process-meta-info">
+                    <div class="doc-count">&#128194; 4 Required Documents</div>
+                    <div class="step-count">&#8985; 5 Steps</div>
+                </div>
+                <a href="/process_detail" class="btn btn-outline btn-full mt-3">Start Process</a>
+            </div>
+
+            <!-- GST Registration -->
+            <div class="process-card" data-category="business" data-name="gst registration">
+                <div class="process-icon bg-green-soft">&#128181;</div>
+                <h3>GST Registration</h3>
+                <p>Seamless tax identification setup workflow with automated business proof verification.</p>
+                <div class="process-meta-info">
+                    <div class="doc-count">&#128194; 5 Required Documents</div>
+                    <div class="step-count">&#8985; 6 Steps</div>
+                </div>
+                <a href="/process_detail" class="btn btn-outline btn-full mt-3">Start Process</a>
+            </div>
+
+            <!-- Company Registration -->
+            <div class="process-card" data-category="business" data-name="company registration">
+                <div class="process-icon bg-purple-soft">&#127970;</div>
+                <h3>Company Registration</h3>
+                <p>Incorporate your startup, LLP, or private limited entity with structured compliance tracking.</p>
+                <div class="process-meta-info">
+                    <div class="doc-count">&#128194; 6 Required Documents</div>
+                    <div class="step-count">&#8985; 8 Steps</div>
+                </div>
+                <a href="/process_detail" class="btn btn-outline btn-full mt-3">Start Process</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+            <div class="avatar-circle">U</div>
+            <div>
+                <strong>Workspace User</strong>
+                <span>MCA Student ID #2026</span>
+            </div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#" class="active">&#127968; Dashboard</a></li>
+            <li><a href="#">&#128193; My Processes</a></li>
+            <li><a href="#">&#128196; Documents</a></li>
+            <li><a href="#">&#128737; Verification</a></li>
+            <li><a href="#">&#9881; Profile</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Dashboard Area -->
+    <main class="dashboard-main">
+        <div class="dashboard-header">
+            <h1>Good Morning, User</h1>
+            <p>Here is the current standing of your active administrative workflows.</p>
+        </div>
+
+        <!-- Main Continue Card -->
+        <div class="card continue-card">
+            <div class="continue-info">
+                <span class="badge-pill success-badge">In Progress</span>
+                <h3>Continue Your Process</h3>
+                <p><strong>Process:</strong> Education Loan</p>
+                <p><strong>Current Step:</strong> Document Verification</p>
+                <div class="progress-track mt-3">
+                    <div class="progress-fill" style="width: 65%;"></div>
+                </div>
+                <span class="progress-text">65% Completed</span>
+            </div>
+            <div>
+                <a href="#" class="btn btn-primary">Continue Process &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="dash-stats-grid">
+            <div class="dash-stat-box">
+                <span class="dash-icon text-primary">&#128202;</span>
+                <div>
+                    <h4>2</h4>
+                    <p>Active Processes</p>
+                </div>
+            </div>
+            <div class="dash-stat-box">
+                <span class="dash-icon text-accent">&#128194;</span>
+                <div>
+                    <h4>10</h4>
+                    <p>Documents Uploaded</p>
+                </div>
+            </div>
+            <div class="dash-stat-box">
+                <span class="dash-icon text-success">&#9745;</span>
+                <div>
+                    <h4>8</h4>
+                    <p>Verified Documents</p>
+                </div>
+            </div>
+            <div class="dash-stat-box">
+                <span class="dash-icon text-warning">&#9888;</span>
+                <div>
+                    <h4>2</h4>
+                    <p>Pending Actions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Content Grid -->
+        <div class="dash-grid-2">
+            <!-- Left Column: Active Processes & Recent Activity -->
+            <div class="space-y">
+                <div class="card">
+                    <h3>Your Active Processes</h3>
+                    <div class="process-item-list">
+                        <div class="process-list-row">
+                            <div>
+                                <strong>Education Loan</strong>
+                                <span>Status: In Progress</span>
+                            </div>
+                            <div class="align-right">
+                                <span class="text-accent font-semibold">65%</span>
+                                <div class="mini-track"><div class="mini-fill" style="width: 65%;"></div></div>
+                            </div>
+                        </div>
+                        <div class="process-list-row">
+                            <div>
+                                <strong>Scholarship</strong>
+                                <span>Status: Documents Pending</span>
+                            </div>
+                            <div class="align-right">
+                                <span class="text-warning font-semibold">40%</span>
+                                <div class="mini-track"><div class="mini-fill bg-warning" style="width: 40%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Document Activity</h3>
+                    <ul class="activity-list">
+                        <li>
+                            <span class="text-success">&#9745;</span>
+                            <div><strong>Aadhaar Card</strong><span>Verified by OCR Engine</span></div>
+                            <span class="badge-status success">Verified</span>
+                        </li>
+                        <li>
+                            <span class="text-danger">&#9888;</span>
+                            <div><strong>Income Certificate</strong><span>Issue Found: Stamped signature unclear</span></div>
+                            <span class="badge-status danger">Issue Found</span>
+                        </li>
+                        <li>
+                            <span class="text-success">&#9745;</span>
+                            <div><strong>Marksheet</strong><span>Verified against university records</span></div>
+                            <span class="badge-status success">Verified</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Column: Next Action Card -->
+            <div>
+                <div class="card alert-highlight-card">
+                    <div class="alert-icon-header">
+                        <span class="text-warning">&#9888;</span>
+                        <h3>Next Action Required</h3>
+                    </div>
+                    <h4>Income Certificate needs attention</h4>
+                    <p class="issue-box"><strong>Issue:</strong> "Some information could not be verified automatically due to low scan contrast or signature obstruction."</p>
+                    <div class="action-steps">
+                        <p><strong>Recommended Fix:</strong></p>
+                        <ol>
+                            <li>Re-scan the document at 300 DPI or higher.</li>
+                            <li>Ensure issuing authority seal is legible.</li>
+                            <li>Re-upload for instant re-verification.</li>
+                        </ol>
+                    </div>
+                    <a href="#" class="btn btn-warning btn-full mt-4">View Guidance</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

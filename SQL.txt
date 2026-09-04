@@ -3,7 +3,7 @@ here this is the table for register the user
 CREATE TABLE USER(
     user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT not null,
-    email TEXT not null,
+    email TEXT not null unique,
     number TEXT not null,
     password TEXT NOT NULL,
     create_date DEFAULT CURRENT_TIMESTAMP

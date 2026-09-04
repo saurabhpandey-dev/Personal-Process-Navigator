@@ -11,7 +11,7 @@
                     <p>Enter your credentials to access your workspace.</p>
                 </div>
                 
-                <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+                <form method="POST" action="/login_user" class="auth-form">
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required>
@@ -31,6 +31,8 @@
                         </label>
                         <a href="#" class="text-link">Forgot password?</a>
                     </div>
+
+                    <h6>{{error}}</h6> <!-- error for the if user no found -->
 
                     <button type="submit" class="btn btn-primary btn-full mt-4">Login</button>
                 </form>

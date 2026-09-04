@@ -11,10 +11,10 @@
                     <p>Start your streamlined application and verification journey today.</p>
                 </div>
                 
-                <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+                <form method="POST" action="/create_user" class="auth-form">
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
-                        <input type="text" id="fullname" name="fullname" class="form-control" placeholder="John Doe" required>
+                        <input type="text" id="fullname" name="name" class="form-control" placeholder="John Doe" required>
                     </div>
 
                     <div class="form-group">
@@ -43,6 +43,7 @@
                         </label>
                     </div>
 
+                    <h6>{{error}}</h6>
                     <button type="submit" class="btn btn-primary btn-full mt-3">Create Account</button>
                 </form>
 

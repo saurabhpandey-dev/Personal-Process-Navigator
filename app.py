@@ -25,12 +25,12 @@ def login_user():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    user_exist = db.execute('select * from user where email = ?',email) # to yha pe list of dictonary return kar rha hai 
+    user_exist = db.execute('select * from users where email = ?',email) # to yha pe list of dictonary return kar rha hai 
     if user_exist and len(user_exist) > 0:
         store_email = user_exist[0]['email'] # index 0 pe kyu ki ek hi dict ayi hai aur uska key hai 'email' 
         store_pass = user_exist[0]['password'] # dict ka key hai 'password'
         if store_email == email and store_pass == password:  
-            return render_template('profile.html',data = user_exist) # ye se ham user ka basic data bhejenge 
+            return render_template('profile.html',user = user_exist[0]) # ye se ham user ka basic data bhejenge 
     else: # if email or password mismatched got print the error 
         return render_template('login.html', error = 'Email and Password not exist') 
     
@@ -49,13 +49,13 @@ def create_user():
     number = request.form.get('phone') # get the number
     password = request.form.get('password') # get the password
 
-    user_exist = db.execute('select * from user where email = ?',email) # sql cammand for check USER table have the email id or not
+    user_exist = db.execute('select * from users where email = ?',email) # sql cammand for check USER table have the email id or not
     # if the user email exist return to the register for the another try for register
     if len(user_exist)>0: 
         return render_template('register.html',error = 'Email alredy exits')
     
     # if email is not exits on the user table all values got stord
-    db.execute('insert into user (name, email, number, password) values (?, ?, ?, ?)',name,email,number,password)
+    db.execute('insert into users (name, email, phone, password) values (?, ?, ?, ?)',name,email,number,password)
     # sql cammand for insert user data to the database user table
     return render_template('login.html') # after inserting data go to the login page for login
 

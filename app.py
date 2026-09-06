@@ -1,8 +1,9 @@
-from flask import Flask, render_template,request,redirect
+from flask import Flask, render_template,request,redirect,session
 from cs50 import SQL
 import os
 
 app = Flask(__name__)
+app.secret_key = 'Shri Shri Shri 1008 Saurabh Prashad Ganguli Ji Maharaj' # create the session id
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.db")  # this line for get the path from anywhere
  
 db = SQL(f'sqlite:///{db_path}')  # database add command
@@ -30,7 +31,8 @@ def login_user():
         store_email = user_exist[0]['email'] # index 0 pe kyu ki ek hi dict ayi hai aur uska key hai 'email' 
         store_pass = user_exist[0]['password'] # dict ka key hai 'password'
         if store_email == email and store_pass == password:  
-            return render_template('profile.html',user = user_exist[0]) # ye se ham user ka basic data bhejenge 
+            session['email'] = store_email
+            return render_template('dashboard.html',user = user_exist[0]) # ye se ham user ka basic data bhejenge 
     else: # if email or password mismatched got print the error 
         return render_template('login.html', error = 'Email and Password not exist') 
     
@@ -74,7 +76,28 @@ def process_detail():
 def upload():
     return render_template('upload.html')
 
+@app.route('/profile')
+def profile():
+    email = session.get('email')
+    user_data = db.execute('SELECT * FROM users WHERE email = ?', email)
+    return render_template('profile.html',user = user_data)
 
+@app.route('/change_password',methods = ['post'])
+def change_password():
+    email = session['email']
+    old_password = request.form.get('old_password')
+    new_password = request.form.get('new_password')
+
+    user = db.execute('SELECT * FROM users WHERE email = ?', email)
+    if not user:
+        return redirect('/login')
+    # 3. Check karo ki form wala old password, database wale password se match karta hai ya nahi
+    if user[0]['password'] != old_password:
+        return render_template('profile.html', user=user[0], error='Incorrect old password!')
+    # 4. Agar sab theek hai, toh naya password update kar do
+    db.execute('UPDATE users SET password = ? WHERE email = ?', new_password, email)
+    # Success message ke sath profile page par bhej do
+    return render_template('profile.html', user=user[0], success='Password changed successfully!')
 
 if __name__ == '__main__':
     app.run(debug=True) 

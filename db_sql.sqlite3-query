@@ -171,3 +171,6 @@ VALUES
     'Business',
     6
 );
+
+-- Processes table me naya column add karna (Jaise image path save karne ke liye)
+ALTER TABLE processes ADD COLUMN image_path TEXT;

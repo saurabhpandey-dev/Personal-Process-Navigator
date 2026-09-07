@@ -1,12 +1,19 @@
 from flask import Flask, render_template,request,redirect,session
 from cs50 import SQL
 import os
+import google.generativeai as genai
 
 app = Flask(__name__)
 app.secret_key = 'Shri Shri Shri 1008 Saurabh Prashad Ganguli Ji Maharaj' # create the session id
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.db")  # this line for get the path from anywhere
  
 db = SQL(f'sqlite:///{db_path}')  # database add command
+
+# Gemini API Key Configuretion  
+# (apni API key yahan direct daali hai ya environment variable use kar sakte hain)
+genai.configure(api_key="AAPKI_GEMINI_API_KEY_YAHAN_AAYEGI") # yha pe maine api key dali hai jo ki  'genai.configure' is funtion
+# add hogi 
+
 
 @app.route('/')
 def index():

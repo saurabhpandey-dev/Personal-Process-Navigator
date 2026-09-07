@@ -193,8 +193,45 @@ def fetch_process_data_from_ai(process_name):
             ]
         }
 
+# this is route for the search process and create the new process
+@app.route('/search_or_create_process',methods=['POST'])
+def search_or_create_process():
+    process_name = request.form.get('process_name','').strip()
 
+    # agar user ne bina likhe search button bda diya to process_list pe chala jaiga
+    if not process_name:
+        return redirect(url_for('process_list'))
+    
+    # Database me check kar rahe hain ki kya yeh process pehle se database me maujood hai ya nahi.
+    existing = db.execute('select * processes where lower(name) like ?', ('%' + process_name.lower() + '%',))
+    # lower(name) ka use isliye kiya hai taaki uppercase/lowercase ki koi problem na ho.
 
+    if existing: # Agar database me process pehle se mil jata hai
+        # naya AI call karne ki zaroorat nahi hai seedha purane process ki ID utha kar uske detail page par redirect kar dega
+        return redirect(url_for('process_detail',process_id=existing[0]['id']))
+    
+    # Agar process database me nahi mila, toh upar banaye gaye 
+    # function ko call karke Gemini AI api se naya data fetch karo.
+    ai_genereted = fetch_process_data_from_ai(prcess_name)
+
+    # AI se mile hue data ko main 'processes' table me insert karna
+    cursor = db.execute(
+        "INSERT INTO processes (name, description, category, total_steps) VALUES (?, ?, ?, ?)",
+        (ai_generated_data['process_name'], ai_generated_data['description'], ai_generated_data['category'], ai_generated_data['total_steps'])
+    )
+    
+    new_process_id = cursor.lastrowid # cursor.lastrowid uss nayi row ki unique ID dega jo abhi just database me insert hui hai
+    
+    # AI dwara diye gaye saare required documents par ek loop chala rahe hain taaki unhe ek-ek karke save kiya ja sake.
+    for req in ai_generated_data['requirements']:
+        # Har ek document ko 'process_requirements' table me insert kar rahe hain, jiska relation upar wali process ID se hai.
+        db.execute(
+            "INSERT INTO process_requirements (process_id, document_name, description, is_required) VALUES (?, ?, ?, ?)",
+            (new_process_id, req['name'], req['description'], 1)
+        )
+                   
+    # Sabhi cheezein database me successfully save hone ke baad, user ko seedha naye process ke detail page par redirect kar do.
+    return redirect(url_for('process_detail', process_id=new_process_id))
     
 
 if __name__ == '__main__':

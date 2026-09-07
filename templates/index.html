@@ -10,12 +10,18 @@
             <div class="badge-pill">
                 <span class="badge-dot"></span> Next-Gen AI Document Verification
             </div>
-            <h1>Navigate Every Process With <span>Confidence.</span></h1>
-            <p>Understand requirements, verify your documents, get AI-powered guidance, and track your application journey from start to finish.</p>
-            <div class="hero-buttons">
-                <a href="/register" class="btn btn-primary btn-lg">Get Started &rarr;</a>
-                <a href="/process" class="btn btn-outline btn-lg">Explore Processes</a>
-            </div>
+            {% if session.get('email') %}
+                <h2>Ready to simplify your next process?</h2>
+                 <p>Join thousands of students and applicants who navigate paperwork seamlessly.</p>
+                <a href="/dashboard" class="btn btn-primary btn-lg">Go to Dashboard</a>
+            {% else %}
+                <h1>Navigate Every Process With <span>Confidence.</span></h1>
+                <p>Understand requirements, verify your documents, get AI-powered guidance, and track your application journey from start to finish.</p>
+                <div class="hero-buttons">
+                    <a href="/register" class="btn btn-primary btn-lg">Get Started &rarr;</a>
+                    <a href="/process" class="btn btn-outline btn-lg">Explore Processes</a>
+                </div>
+            {% endif %}
         </div>
         
         <!-- Right-side CSS-only product/dashboard illustration -->

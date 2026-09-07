@@ -103,6 +103,20 @@ def profile():
     user_data = db.execute('SELECT * FROM users WHERE email = ?', email)
     return render_template('profile.html',user = user_data)
 
+@app.route('/change_password',methods = ['POST'])
+def change_password():
+    email = session['email']
+    old_password = request.form.get('old_password')
+    new_password = request.form.get('new_password')
+
+    user = db.execute('SELECT * FROM users WHERE email = ?', email)
+    if user[0]['password'] != old_password:
+        return render_template('profile.html', user=user[0], error='Incorrect old password!')
+    # 4. Agar sab theek hai, toh naya password update kar do
+    db.execute('UPDATE users SET password = ? WHERE email = ?', new_password, email)
+    # Success message ke sath profile page par bhej do
+    return render_template('profile.html', user=user[0], success='Password changed successfully!')
+
 
 if __name__ == '__main__':
     app.run(debug=True) 

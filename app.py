@@ -110,6 +110,7 @@ def profile():
     user_data = db.execute('SELECT * FROM users WHERE email = ?', email)
     return render_template('profile.html',user = user_data)
 
+# this is the route for the changing the password
 @app.route('/change_password',methods = ['POST'])
 def change_password():
     email = session['email']
@@ -124,6 +125,77 @@ def change_password():
     # Success message ke sath profile page par bhej do
     return render_template('profile.html', user=user[0], success='Password changed successfully!')
 
+
+# ye function ai ko fatch karegi 
+def fetch_process_data_from_ai(process_name):
+    """
+    Yeh ek custom function hai jo naye process ka naam input leta hai,
+    Gemini AI ko request bhejta hai, aur wahan se JSON data nikal kar return karta hai.
+    """
+    
+    # Gemini ka sabse fast aur text-based tasks ke liye behtareen model select kiya ja raha hai.
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    # Yahan hum AI ko strict instructions (prompt) de rahe hain ki hame data kis format me chahiye.
+    #PROMPT for the search actual data
+    prompt = f"""
+    You are an expert government compliance and documentation assistant. 
+    Provide the details for the process: "{process_name}".
+    
+    You MUST return the response strictly as a valid JSON object with the following keys and structure:
+    {{
+      "process_name": "{process_name}",
+      "description": "A short 1-2 line description of what this process is.",
+      "category": "Choose one: Government, Financial, Legal, or Student",
+      "total_steps": 3,
+      "requirements": [
+        {{"name": "Document Name 1", "description": "Short description of why it is needed"}},
+        {{"name": "Document Name 2", "description": "Short description"}}
+      ]
+    }}
+    Do not include any extra text, markdown formatting like ```json, or explanation outside the JSON.
+    """
+    
+    # try-except block ka use error handling ke liye kiya jata hai taaki 
+    # agar internet ya API me koi dikkat aaye toh app crash na ho.
+    try:
+        # model.generate_content() prompt ko AI ke paas bhejta hai aur response generate karta hai.
+        response = model.generate_content(prompt)
+        
+        # response.text se AI ka diya hua text nikalte hain aur .strip() se aage-piche ke extra spaces hata dete hain.
+        text_response = response.text.strip()
+        
+        # Agar AI galti se markdown formatting (jaise ```json ... ```) laga de, toh hum use slice karke saaf kar dete hain.
+        if text_response.startswith("```json"):
+            text_response = text_response[7:-3].strip()
+        elif text_response.startswith("```"):
+            text_response = text_response[3:-3].strip()
+            
+        # json.loads() text/string ko Python Dictionary me badal deta hai taaki hum keys ke zariye data access kar sakein.
+        data = json.loads(text_response)
+        
+        # Parsed data ko function ke bahar return kar dete hain.
+        return data
+        
+    except Exception as e:
+        # Agar koi bhi error aata hai (jaise internet nahi hai ya AI down hai), toh yeh block chalega.
+        print(f"AI Error: {e}")
+        
+        # Fallback data: Agar AI fail ho jaye, toh app ko chalane ke liye ek default dictionary return kar dete hain.
+        return {
+            "process_name": process_name,
+            "description": f"Standard workflow for {process_name}.",
+            "category": "General",
+            "total_steps": 3,
+            "requirements": [
+                {"name": "Identity Proof", "description": "Standard ID document"},
+                {"name": "Application Form", "description": "Filled form"}
+            ]
+        }
+
+
+
+    
 
 if __name__ == '__main__':
     app.run(debug=True) 

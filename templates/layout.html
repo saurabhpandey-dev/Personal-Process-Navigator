@@ -31,8 +31,16 @@
 
             <div class="nav-actions-desktop">
                 <!-- yha pe login aur new ragister k liye button bnaya gya hai -->
-                <a href="/login" class="btn btn-text">Login</a> <!-- yha bhi login ka button hai  -->
-                <a href="/register" class="btn btn-primary btn-sm">Get Started</a> <!-- aur ye new start ka hai--> 
+                <!-- <a href="/login" class="btn btn-text">Login</a> yha bhi login ka button hai  -->
+                <!-- <a href="/register" class="btn btn-primary btn-sm">Get Started</a> aur ye new start ka hai  -->
+                {% if session.get('email') %}
+                    <a href="/profile" class="btn btn-primary btn-sm">Profile</a>
+                    <a href="/logout" class="btn btn-text">Logout</a> <!-- Logout Button -->
+                    <!-- Agar session me email nahi hai (Matlab user logged out hai) -->
+                {% else %}
+                    <a href="/login" class="btn btn-text">Login</a>
+                    <a href="/register" class="btn btn-primary btn-sm">Register</a> <!-- Login Button -->
+                {% endif %}
             </div>
 
             <button class="mobile-menu-toggle" id="menuToggle" aria-label="Toggle navigation">

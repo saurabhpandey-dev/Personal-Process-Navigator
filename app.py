@@ -12,10 +12,6 @@ db = SQL(f'sqlite:///{db_path}')  # database add command
 def index():
     return render_template('index.html')
 
-@app.route('/dashboard')
-def dashboard():
-    return render_template('dashboard.html')
-
 # this route for calling ther user login page
 @app.route('/login')
 def login():
@@ -60,6 +56,25 @@ def create_user():
     db.execute('insert into users (name, email, phone, password) values (?, ?, ?, ?)',name,email,number,password)
     # sql cammand for insert user data to the database user table
     return render_template('login.html') # after inserting data go to the login page for login
+
+# Dashboard route: Ye check karega ki user login hai ya nahi, tabhi khulega
+@app.route('/dashboard',methods = ["GET",'POST'])
+def dashboard():
+    # Agar session me email nahi hai, matlab user ne login nahi kiya
+    if 'email' not in session:
+        return redirect('/login')  # Toh seedha login page par bhej do
+    
+    # Session se email nikal kar database se user ka saara data fetch karenge
+    email = session['email']
+    user_data = db.execute('SELECT * FROM users WHERE email = ?', email)
+    
+    # Safety check: agar user database me nahi mila toh session clear karke login par bhejo
+    if not user_data:
+        session.clear()
+        return redirect('/login')
+
+    # User ka data dashboard template ko bhej denge
+    return render_template('dashboard.html', user=user_data[0])
 
 # this route for calling the process page
 @app.route('/process')

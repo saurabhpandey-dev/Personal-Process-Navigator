@@ -69,26 +69,28 @@
 </section>
 
 <!-- Trusted / Stats Section -->
-<section class="stats-section">
-    <div class="container stats-grid">
-        <div class="stat-card">
-            <h3>00+</h3>
-            <p>Supported Processes</p>
+{% if session.get('email') %}
+    <section class="stats-section">
+        <div class="container stats-grid">
+            <div class="stat-card">
+                <h3>00+</h3>
+                <p>Supported Processes</p>
+            </div>
+            <div class="stat-card">
+                <h3>Instant</h3>
+                <p>AI-Powered Guidance</p>
+            </div>
+            <div class="stat-card">
+                <h3>99.0%</h3>
+                <p>Document Verification Accuracy</p>
+            </div>
+            <div class="stat-card">
+                <h3>End-to-End</h3>
+                <p>Step-by-Step Tracking</p>
+            </div>
         </div>
-        <div class="stat-card">
-            <h3>Instant</h3>
-            <p>AI-Powered Guidance</p>
-        </div>
-        <div class="stat-card">
-            <h3>99.0%</h3>
-            <p>Document Verification Accuracy</p>
-        </div>
-        <div class="stat-card">
-            <h3>End-to-End</h3>
-            <p>Step-by-Step Tracking</p>
-        </div>
-    </div>
-</section>
+    </section>
+{%endif%}
 
 <!-- Popular Processes Section -->
 <section id="processes" class="processes-section">

@@ -76,6 +76,12 @@ def dashboard():
     # User ka data dashboard template ko bhej denge
     return render_template('dashboard.html', user=user_data[0])
 
+# this route is for logout the user and and the session
+@app.route('/logout')
+def logout(): # Logout route: Session clear karke login page par bhejne ke liye
+    session.clear()# Ye session ka saara data mita dega
+    return redirect('/login')
+
 # this route for calling the process page
 @app.route('/process')
 def process():

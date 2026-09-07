@@ -3,32 +3,32 @@
 
 {% block content %}
 <div class="dashboard-wrapper">
-    <!-- Sidebar -->
     <aside class="dashboard-sidebar">
         <div class="sidebar-user">
-            <div class="avatar-circle">U</div>
+            <div class="avatar-circle">
+                {{ user.name[0] | upper if user and user.name else 'U' }}
+            </div>
             <div>
-                <strong>Workspace User</strong>
-                <span>MCA Student ID #2026</span>
+                <strong>{{ user.name if user else 'Guest User' }}</strong>
+                <span>MCA Student ID</span>
+                <span>#{{ user.id if user else '2026' }}</span>
             </div>
         </div>
         <ul class="sidebar-nav">
-            <li><a href="#" class="active">&#127968; Dashboard</a></li>
-            <li><a href="#">&#128193; My Processes</a></li>
-            <li><a href="#">&#128196; Documents</a></li>
+            <li><a href="/dashboard" class="active">&#127968; Dashboard</a></li>
+            <li><a href="/process">&#128193; My Processes</a></li>
+            <li><a href="/upload">&#128196; Documents</a></li>
             <li><a href="#">&#128737; Verification</a></li>
-            <li><a href="#">&#9881; Profile</a></li>
+            <li><a href="/profile">&#9881; Profile</a></li>
         </ul>
     </aside>
 
-    <!-- Main Dashboard Area -->
     <main class="dashboard-main">
         <div class="dashboard-header">
-            <h1>Good Morning, User</h1>
+            <h1>Good Morning, {{ user.name.split()[0] if user and user.name else 'User' }}</h1>
             <p>Here is the current standing of your active administrative workflows.</p>
         </div>
 
-        <!-- Main Continue Card -->
         <div class="card continue-card">
             <div class="continue-info">
                 <span class="badge-pill success-badge">In Progress</span>
@@ -41,11 +41,10 @@
                 <span class="progress-text">65% Completed</span>
             </div>
             <div>
-                <a href="#" class="btn btn-primary">Continue Process &rarr;</a>
+                <a href="/process_detail" class="btn btn-primary">Continue Process &rarr;</a>
             </div>
         </div>
 
-        <!-- Stats Row -->
         <div class="dash-stats-grid">
             <div class="dash-stat-box">
                 <span class="dash-icon text-primary">&#128202;</span>
@@ -77,9 +76,7 @@
             </div>
         </div>
 
-        <!-- Two Column Content Grid -->
         <div class="dash-grid-2">
-            <!-- Left Column: Active Processes & Recent Activity -->
             <div class="space-y">
                 <div class="card">
                     <h3>Your Active Processes</h3>
@@ -112,7 +109,7 @@
                     <ul class="activity-list">
                         <li>
                             <span class="text-success">&#9745;</span>
-                            <div><strong>Aadhaar Card</strong><span>Verified by OCR Engine</span></div>
+                            <div><strong>Identity Document</strong><span>Verified by OCR Engine</span></div>
                             <span class="badge-status success">Verified</span>
                         </li>
                         <li>
@@ -129,10 +126,9 @@
                 </div>
             </div>
 
-            <!-- Right Column: Next Action Card -->
             <div>
                 <div class="card alert-highlight-card">
-                    <div class="alert-icon-header">
+                    <div class="alert-header">
                         <span class="text-warning">&#9888;</span>
                         <h3>Next Action Required</h3>
                     </div>
@@ -146,7 +142,7 @@
                             <li>Re-upload for instant re-verification.</li>
                         </ol>
                     </div>
-                    <a href="#" class="btn btn-warning btn-full mt-4">View Guidance</a>
+                    <a href="/upload" class="btn btn-warning btn-full mt-4">View Guidance</a>
                 </div>
             </div>
         </div>

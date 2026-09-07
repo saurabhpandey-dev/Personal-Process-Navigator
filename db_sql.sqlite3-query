@@ -1,13 +1,173 @@
 -- database: ./data.db
 
--- Use the ▷ button in the top right corner to run the entire file.
+SELECT * FROM USER;
 
-CREATE TABLE USER(
-    user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    name TEXT not null,
-    email TEXT not null,
-    number TEXT not null,
+-- ============================================
+-- PERSONAL PROCESS NAVIGATOR
+-- SQLite Database Schema
+-- ============================================
+
+PRAGMA foreign_keys = ON;
+
+-- ============================================
+-- 1. USERS
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    phone TEXT,
     password TEXT NOT NULL,
-    create_date DEFAULT CURRENT_TIMESTAMP
-)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
+
+-- ============================================
+-- 2. PROCESSES
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS processes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    category TEXT,
+    total_steps INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================
+-- 3. PROCESS REQUIREMENTS
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS process_requirements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    process_id INTEGER NOT NULL,
+    document_name TEXT NOT NULL,
+    description TEXT,
+    is_required INTEGER DEFAULT 1,
+
+    FOREIGN KEY (process_id)
+        REFERENCES processes(id)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================
+-- 4. USER PROCESSES
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS user_processes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    process_id INTEGER NOT NULL,
+    current_step INTEGER DEFAULT 1,
+    progress INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'In Progress',
+    started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    completed_at DATETIME,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (process_id)
+        REFERENCES processes(id)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================
+-- 5. DOCUMENTS
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_process_id INTEGER NOT NULL,
+    requirement_id INTEGER NOT NULL,
+    file_name TEXT NOT NULL,
+    file_path TEXT NOT NULL,
+    file_type TEXT,
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_process_id)
+        REFERENCES user_processes(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (requirement_id)
+        REFERENCES process_requirements(id)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================
+-- 6. DOCUMENT VERIFICATION
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS document_verification (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    document_id INTEGER NOT NULL,
+
+    ocr_text TEXT,
+    verification_status TEXT DEFAULT 'Pending',
+    issue_description TEXT,
+    correction_guidance TEXT,
+
+    verified_at DATETIME,
+
+    FOREIGN KEY (document_id)
+        REFERENCES documents(id)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================
+-- 7. PROCESS TRACKING
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS process_tracking (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_process_id INTEGER NOT NULL,
+    step_number INTEGER NOT NULL,
+    step_name TEXT NOT NULL,
+    status TEXT DEFAULT 'Pending',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_process_id)
+        REFERENCES user_processes(id)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================
+-- SAMPLE PROCESSES
+-- ============================================
+
+INSERT INTO processes
+    (name, description, category, total_steps)
+VALUES
+(
+    'Education Loan',
+    'Guidance for education loan application and required documents.',
+    'Finance',
+    6
+),
+(
+    'Scholarship',
+    'Guidance for scholarship application and document requirements.',
+    'Education',
+    5
+),
+(
+    'GST Registration',
+    'Step-by-step guidance for GST registration.',
+    'Business',
+    5
+),
+(
+    'Company Registration',
+    'Guidance for company registration and required documents.',
+    'Business',
+    6
+);

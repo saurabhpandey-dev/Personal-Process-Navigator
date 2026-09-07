@@ -174,3 +174,19 @@ VALUES
 
 -- Processes table me naya column add karna (Jaise image path save karne ke liye)
 ALTER TABLE processes ADD COLUMN image_path TEXT;
+
+
+-- 8. USER VAULT (Global Document Repository)
+
+CREATE TABLE IF NOT EXISTS user_vault (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    document_type TEXT NOT NULL,      -- Jaise: 'Aadhaar Card', 'PAN Card'
+    original_name TEXT NOT NULL,      -- User ki original file ka naam
+    file_path TEXT NOT NULL,          -- Server par save file ka path (Folder + UUID + Timestamp)
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);

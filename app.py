@@ -1,9 +1,11 @@
-from flask import Flask, render_template,request,redirect,session
+from flask import Flask, render_template,request,redirect,session,jsonify
 from cs50 import SQL
 import os
 import google.generativeai as genai
 from datetime import datetime
 import uuid
+import json
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'Shri Shri Shri 1008 Saurabh Prashad Ganguli Ji Maharaj' # create the session id
@@ -305,6 +307,22 @@ def upload_vault_doc():
         )
         
     return redirect(request.referrer)
+
+# Helper function jo check karega ki user ne specific document vault me upload kiya hai ya nahi
+@app.context_processor
+utility_processor
+def utility_processor():
+    def get_user_vault_doc(user_id, document_type):
+        if not user_id:
+            return None
+        # Database se query karo ki is user_id aur document_type ki koi file hai kya
+        record = db.execute(
+            "SELECT * FROM user_vault WHERE user_id = ? AND document_type = ?",
+            (user_id, document_type)
+        )
+        return record[0] if record else None
+        
+    return dict(get_user_vault_doc=get_user_vault_doc)
 
 if __name__ == '__main__':
     app.run(debug=True) 

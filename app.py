@@ -2,11 +2,14 @@ from flask import Flask, render_template,request,redirect,session
 from cs50 import SQL
 import os
 import google.generativeai as genai
+from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 app.secret_key = 'Shri Shri Shri 1008 Saurabh Prashad Ganguli Ji Maharaj' # create the session id
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.db")  # this line for get the path from anywhere
- 
+BASE_VAULT_DIR = 'static/uploads/vault'
+
 db = SQL(f'sqlite:///{db_path}')  # database add command
 
 # Gemini API Key Configuretion  
@@ -233,6 +236,75 @@ def search_or_create_process():
     # Sabhi cheezein database me successfully save hone ke baad, user ko seedha naye process ke detail page par redirect kar do.
     return redirect(url_for('process_detail', process_id=new_process_id))
     
+
+# this route for save the dacument in the saperate folder    
+@app.route('/upload_vault_doc', methods=['POST'])
+def upload_vault_doc():
+    # 1. Current logged-in user ki ID session se nikalna
+    user_id = session.get('user_id', 1) 
+    
+    # 2. Database se us user ki details (name, email) lena taaki folder name me use kar sakein
+    user_data = db.execute("SELECT id, name, email FROM users WHERE id = ?", (user_id,))
+    if not user_data:
+        return redirect(url_for('login'))
+        
+    user = user_data[0]
+    
+    # Folder name ke liye safe string banana (jaise: 1_rahul@gmail.com_rahul_kumar)
+    safe_email = user['email'].strip().lower().replace('@', '_at_').replace('.', '_')
+    safe_name = secure_filename(user['name'].strip().lower().replace(' ', '_'))
+    user_folder_name = f"{user['id']}_{safe_email}_{safe_name}"
+    
+    # 3. Form se document type aur file lena
+    document_type = request.form.get('document_type') # Jaise: 'Aadhaar Card'
+    file = request.files.get('document_file')
+    
+    if not document_type or not file or file.filename == '':
+        return redirect(request.referrer)
+        
+    # 4. Document type ka subfolder banana (jaise: 'aadhaar_card')
+    safe_doc_folder = document_type.strip().lower().replace(' ', '_')
+    
+    # Final target folder path: static/uploads/vault/1_rahul_gmail_com_rahul/aadhaar_card/
+    target_folder = os.path.join(BASE_VAULT_DIR, user_folder_name, safe_doc_folder)
+    os.makedirs(target_folder, exist_ok=True)
+    
+    # 5. Unique filename generate karna (Timestamp + UUID)
+    original_name = secure_filename(file.filename)
+    ext = original_name.rsplit('.', 1)[1].lower() if '.' in original_name else 'jpg'
+    clean_base_name = secure_filename(original_name.rsplit('.', 1)[0])
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    unique_id = str(uuid.uuid4())[:8]
+    unique_filename = f"{timestamp}_{unique_id}_{clean_base_name}.{ext}"
+    
+    # 6. File ko server par save karna
+    full_file_path = os.path.join(target_folder, unique_filename)
+    file.save(full_file_path)
+    
+    # Database me save karne ke liye relative path
+    db_path = f"uploads/vault/{user_folder_name}/{safe_doc_folder}/{unique_filename}"
+    
+    # 7. Check karo kya is user ka yeh document pehle se database me hai?
+    existing_record = db.execute(
+        "SELECT * FROM user_vault WHERE user_id = ? AND document_type = ?", 
+        (user_id, document_type)
+    )
+    
+    if existing_record:
+        # Agar pehle se hai, toh naye path se UPDATE kar do (Purani file replace ho jayegi)
+        db.execute(
+            "UPDATE user_vault SET file_path = ?, original_name = ?, uploaded_at = CURRENT_TIMESTAMP WHERE user_id = ? AND document_type = ?",
+            (db_path, original_name, user_id, document_type)
+        )
+    else:
+        # Agar pehli baar daal raha hai, toh INSERT kar do
+        db.execute(
+            "INSERT INTO user_vault (user_id, document_type, original_name, file_path) VALUES (?, ?, ?, ?)",
+            (user_id, document_id if 'document_id' in locals() else None, original_name, db_path) # Adjust as per your columns
+        )
+        
+    return redirect(request.referrer)
 
 if __name__ == '__main__':
     app.run(debug=True) 

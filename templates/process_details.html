@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %}Education Loan Details - Personal Process Navigator{% endblock %}
+{% block title %}{{ process.name }} Details - Personal Process Navigator{% endblock %}
 
 {% block content %}
 <section class="process-detail-section">
@@ -8,9 +8,14 @@
         <div class="detail-header-wrapper">
             <div>
                 <a href="/process" class="text-link text-muted mb-2 inline-block">&larr; Back to Processes</a>
-                <span class="badge-pill">Education Loan Workflow</span>
-                <h1>Education Loan Process Guidance</h1>
-                <p>Review the exact required documents and step-by-step milestone protocol to ensure error-free bank submission.</p>
+                <!-- Category Dynamic -->
+                <span class="badge-pill">{{ process.category }} Workflow</span>
+                
+                <!-- Process Name Dynamic -->
+                <h1>{{ process.name }} Process Guidance</h1>
+                
+                <!-- Process Description Dynamic -->
+                <p>{{ process.description }}</p>
             </div>
             <div class="detail-action-box">
                 <a href="/upload" class="btn btn-primary btn-lg">Upload First Document &rarr;</a>
@@ -21,106 +26,80 @@
             <!-- Left Column: Checklist & Steps -->
             <div class="space-y">
                 <!-- Required Documents Checklist -->
-                <!-- Required Documents Checklist -->
-<div class="card">
-    <h3>&#128194; Required Documents Checklist</h3>
-    <p class="text-muted text-sm mb-3">Ensure you have digital copies ready in PDF, JPG, or PNG format.</p>
-    
-    <ul class="checklist-items" style="list-style: none; padding: 0;">
-        {% for req in requirements %}
-            <!-- Helper function se check karo kya ye document user ke vault me pehle se hai -->
-            {% set user_doc = get_user_vault_doc(session.get('user_id'), req.document_name) %}
-            
-            <li class="py-3 border-bottom" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-bottom: 15px;">
-                
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <!-- Document Name & Description -->
-                    <div>
-                        <label class="checklist-label" style="font-weight: bold; font-size: 1.05rem;">
-                            <span>{{ req.document_name }}</span>
-                        </label>
-                        <p class="text-muted text-sm mb-0">{{ req.description }}</p>
-                    </div>
+                <div class="card">
+                    <h3>&#128194; Required Documents Checklist</h3>
+                    <p class="text-muted text-sm mb-3">Ensure you have digital copies ready in PDF, JPG, or PNG format.</p>
                     
-                    <!-- Status Badge -->
-                    <div>
-                        {% if user_doc %}
-                            <span class="badge-status success" style="background-color: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✔ Uploaded</span>
-                        {% else %}
-                            <span class="badge-status warning" style="background-color: #fff3cd; color: #664d03; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Pending</span>
-                        {% endif %}
-                    </div>
+                    <ul class="checklist-items" style="list-style: none; padding: 0;">
+                        {% for req in requirements %}
+                            <!-- Helper function se check karo kya ye document user ke vault me pehle se hai -->
+                            {% set user_doc = get_user_vault_doc(session.get('user_id'), req.document_name) %}
+                            
+                            <li class="py-3 border-bottom" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-bottom: 15px;">
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <!-- Document Name & Description -->
+                                    <div>
+                                        <label class="checklist-label" style="font-weight: bold; font-size: 1.05rem;">
+                                            <span>{{ req.document_name }}</span>
+                                        </label>
+                                        <p class="text-muted text-sm mb-0">{{ req.description }}</p>
+                                    </div>
+                                    
+                                    <!-- Status Badge -->
+                                    <div>
+                                        {% if user_doc %}
+                                            <span class="badge-status success" style="background-color: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✔ Uploaded</span>
+                                        {% else %}
+                                            <span class="badge-status warning" style="background-color: #fff3cd; color: #664d03; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Pending</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Agar pehle se uploaded hai toh uska link/view dikhao -->
+                                {% if user_doc %}
+                                    <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;">
+                                        <span>📄 Saved File: <a href="{{ url_for('static', filename=user_doc.file_path) }}" target="_blank" class="text-primary">{{ user_doc.original_name }}</a></span>
+                                        <span class="text-muted small">Uploaded on: {{ user_doc.uploaded_at }}</span>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Upload / Replace Form -->
+                                <form action="{{ url_for('upload_vault_doc') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                                    <input type="hidden" name="document_type" value="{{ req.document_name }}">
+                                    <input type="file" name="document_file" class="form-control" style="font-size: 0.9rem;" {% if not user_doc %}required{% endif %}>
+                                    <button class="btn btn-primary" type="submit" style="white-space: nowrap; padding: 6px 14px; font-size: 0.9rem;">
+                                        {% if user_doc %} Replace File {% else %} Upload File {% endif %}
+                                    </button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
 
-                <!-- Agar pehle se uploaded hai toh uska link/view dikhao -->
-                {% if user_doc %}
-                    <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;">
-                        <span>📄 Saved File: <a href="{{ url_for('static', filename=user_doc.file_path) }}" target="_blank" class="text-primary">{{ user_doc.original_name }}</a></span>
-                        <span class="text-muted small">Uploaded on: {{ user_doc.uploaded_at }}</span>
-                    </div>
-                {% endif %}
-
-                <!-- Upload / Replace Form -->
-                <form action="{{ url_for('upload_vault_doc') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
-                    <!-- Hidden input taaki backend ko pata chale kis document type ke liye file hai -->
-                    <input type="hidden" name="document_type" value="{{ req.document_name }}">
-                    
-                    <input type="file" name="document_file" class="form-control" style="font-size: 0.9rem;" {% if not user_doc %}required{% endif %}>
-                    
-                    <button class="btn btn-primary" type="submit" style="white-space: nowrap; padding: 6px 14px; font-size: 0.9rem;">
-                        {% if user_doc %} Replace File {% else %} Upload File {% endif %}
-                    </button>
-                </form>
-
-            </li>
-        {% endfor %}
-    </ul>
-</div>
-
-                <!-- Step-by-Step Timeline -->
+                <!-- Step-by-Step Timeline (Aap ise bhi dynamic ya general rakh sakte hain) -->
                 <div class="card">
                     <h3>&#128200; Step-by-Step Process Timeline</h3>
                     <div class="timeline-container mt-4">
                         <div class="timeline-step completed">
                             <span class="timeline-marker">01</span>
                             <div class="timeline-info">
-                                <strong>Eligibility Check</strong>
-                                <p>Verify course accreditation, university ranking, and loan quantum limits.</p>
-                            </div>
-                        </div>
-                        <div class="timeline-step completed">
-                            <span class="timeline-marker">02</span>
-                            <div class="timeline-info">
-                                <strong>Document Collection</strong>
-                                <p>Gather identity proofs, academic certificates, and income certificates.</p>
+                                <strong>Initial Setup & Research</strong>
+                                <p>Understand {{ process.name }} requirements and collect initial guidelines.</p>
                             </div>
                         </div>
                         <div class="timeline-step current">
-                            <span class="timeline-marker">03</span>
+                            <span class="timeline-marker">02</span>
                             <div class="timeline-info">
                                 <strong>Document Verification</strong>
-                                <p>Run OCR scan and automated consistency checks to detect discrepancies.</p>
+                                <p>Upload and verify all required documents through your secure vault.</p>
                             </div>
                         </div>
                         <div class="timeline-step">
-                            <span class="timeline-marker">04</span>
+                            <span class="timeline-marker">03</span>
                             <div class="timeline-info">
-                                <strong>Application Preparation</strong>
-                                <p>Compile verified files into a unified loan dossier.</p>
-                            </div>
-                        </div>
-                        <div class="timeline-step">
-                            <span class="timeline-marker">05</span>
-                            <div class="timeline-info">
-                                <strong>Application Submission</strong>
-                                <p>Submit formal package to partner financial institution.</p>
-                            </div>
-                        </div>
-                        <div class="timeline-step">
-                            <span class="timeline-marker">06</span>
-                            <div class="timeline-info">
-                                <strong>Process Completion</strong>
-                                <p>Sanction letter issuance and disbursement scheduling.</p>
+                                <strong>Final Submission</strong>
+                                <p>Review completed documentation and finalize submission.</p>
                             </div>
                         </div>
                     </div>
@@ -132,20 +111,19 @@
                 <div class="card alert-highlight-card">
                     <div class="alert-icon-header">
                         <span class="text-accent">&#9432;</span>
-                        <h3>Important Notes</h3>
+                        <h3>Important Notes for {{ process.name }}</h3>
                     </div>
                     <ul class="notes-list">
-                        <li>Ensure all scanned certificates are clear and completely legible (minimum 300 DPI recommended).</li>
-                        <li>Name spelling across Aadhaar, PAN, and Academic Marksheets must match precisely.</li>
-                        <li>Income certificates should not be older than 6 months from the date of submission.</li>
+                        <li>Ensure all uploaded files are completely clear and legible.</li>
+                        <li>Verify that all personal details match across your identity proofs.</li>
                     </ul>
                 </div>
 
                 <div class="card">
                     <h3>Ready to proceed?</h3>
-                    <p class="text-muted text-sm mb-4">Upload your documents one by one to begin automated validation.</p>
+                    <p class="text-muted text-sm mb-4">Upload your documents one by one to complete this process.</p>
                     <a href="/upload" class="btn btn-primary btn-full">Proceed to Upload &rarr;</a>
-                    <a href="/tracking" class="btn btn-outline btn-full mt-3">View Active Tracking</a>
+                    <a href="/process" class="btn btn-outline btn-full mt-3">Back to All Processes</a>
                 </div>
             </div>
         </div>

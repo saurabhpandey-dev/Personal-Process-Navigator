@@ -100,9 +100,19 @@ def process():
     return render_template('process.html')
 
 # this route for calling the process details page
-@app.route('/process_detail')
-def process_detail():
-    return render_template('process_details.html')
+@app.route('/process/<int:process_id>')
+def process_detail(process_id):
+    # Process ki details database se fetch karo
+    process_list = db.execute("SELECT * FROM processes WHERE id = ?", process_id)
+    if not process_list:
+        return redirect(url_for('process'))
+    process = process_list[0]
+    
+    # Is process ke saare required documents fetch karo
+    requirements = db.execute("SELECT * FROM process_requirements WHERE process_id = ?", process_id)
+    
+    # Template render karte waqt process aur requirements dono pass karo
+    return render_template('process_details.html', process=process, requirements=requirements)
 
 # this route for calling the upload page
 @app.route('/upload')
@@ -213,7 +223,7 @@ def search_or_create_process():
 
     if existing: # Agar database me process pehle se mil jata hai
         # naya AI call karne ki zaroorat nahi hai seedha purane process ki ID utha kar uske detail page par redirect kar dega
-        return render_template('process_details.html',process_id=existing[0]['id'])
+        return render_template('process_details.html', process_id=existing[0]['id'])
     
     # Agar process database me nahi mila, toh upar banaye gaye 
     # function ko call karke Gemini AI api se naya data fetch karo.
@@ -235,7 +245,7 @@ def search_or_create_process():
         )
                    
     # Sabhi cheezein database me successfully save hone ke baad, user ko seedha naye process ke detail page par redirect kar do.
-    return render_template('process_details.html', process_id=new_process_id)
+    return redirect(url_for('process_detail', process_id=new_process_id))
     
 
 # this route for save the dacument in the saperate folder    

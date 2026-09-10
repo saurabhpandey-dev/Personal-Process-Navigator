@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,session,jsonify
+from flask import Flask, render_template,request,redirect,session,jsonify,url_for
 from cs50 import SQL
 import os
 import google.generativeai as genai
@@ -199,44 +199,43 @@ def fetch_process_data_from_ai(process_name):
         }
 
 # this is route for the search process and create the new process
-@app.route('/search_or_create_process',methods=['POST'])
+@app.route('/search_or_create_process', methods = ['POST'])
 def search_or_create_process():
     process_name = request.form.get('process_name','').strip()
 
     # agar user ne bina likhe search button bda diya to process_list pe chala jaiga
     if not process_name:
-        return redirect(url_for('process_list'))
+        return redirect(url_for('process'))
     
     # Database me check kar rahe hain ki kya yeh process pehle se database me maujood hai ya nahi.
-    existing = db.execute('select * processes where lower(name) like ?', ('%' + process_name.lower() + '%',))
+    existing = db.execute('select * from processes where lower(name) like ?', ('%' + process_name.lower() + '%',))
     # lower(name) ka use isliye kiya hai taaki uppercase/lowercase ki koi problem na ho.
 
     if existing: # Agar database me process pehle se mil jata hai
         # naya AI call karne ki zaroorat nahi hai seedha purane process ki ID utha kar uske detail page par redirect kar dega
-        return redirect(url_for('process_detail',process_id=existing[0]['id']))
+        return render_template('process_details.html',process_id=existing[0]['id'])
     
     # Agar process database me nahi mila, toh upar banaye gaye 
     # function ko call karke Gemini AI api se naya data fetch karo.
-    ai_genereted = fetch_process_data_from_ai(prcess_name)
+    ai_generated_data = fetch_process_data_from_ai(process_name)
 
     # AI se mile hue data ko main 'processes' table me insert karna
-    cursor = db.execute(
-        "INSERT INTO processes (name, description, category, total_steps) VALUES (?, ?, ?, ?)",
-        (ai_generated_data['process_name'], ai_generated_data['description'], ai_generated_data['category'], ai_generated_data['total_steps'])
-    )
     
-    new_process_id = cursor.lastrowid # cursor.lastrowid uss nayi row ki unique ID dega jo abhi just database me insert hui hai
+    new_process_id  = db.execute(
+        "INSERT INTO processes (name, description, category, total_steps) VALUES (?, ?, ?, ?)",
+        ai_generated_data['process_name'], ai_generated_data['description'], ai_generated_data['category'], ai_generated_data['total_steps']
+    )
     
     # AI dwara diye gaye saare required documents par ek loop chala rahe hain taaki unhe ek-ek karke save kiya ja sake.
     for req in ai_generated_data['requirements']:
         # Har ek document ko 'process_requirements' table me insert kar rahe hain, jiska relation upar wali process ID se hai.
         db.execute(
             "INSERT INTO process_requirements (process_id, document_name, description, is_required) VALUES (?, ?, ?, ?)",
-            (new_process_id, req['name'], req['description'], 1)
+            new_process_id, req['name'], req['description'], 1
         )
                    
     # Sabhi cheezein database me successfully save hone ke baad, user ko seedha naye process ke detail page par redirect kar do.
-    return redirect(url_for('process_detail', process_id=new_process_id))
+    return render_template('process_details.html', process_id=new_process_id)
     
 
 # this route for save the dacument in the saperate folder    
@@ -309,20 +308,18 @@ def upload_vault_doc():
     return redirect(request.referrer)
 
 # Helper function jo check karega ki user ne specific document vault me upload kiya hai ya nahi
-@app.context_processor
-utility_processor
-def utility_processor():
-    def get_user_vault_doc(user_id, document_type):
-        if not user_id:
-            return None
-        # Database se query karo ki is user_id aur document_type ki koi file hai kya
-        record = db.execute(
-            "SELECT * FROM user_vault WHERE user_id = ? AND document_type = ?",
-            (user_id, document_type)
-        )
-        return record[0] if record else None
-        
-    return dict(get_user_vault_doc=get_user_vault_doc)
+# 1. Yeh function define karein (routes ke aas-pass ya kahin bhi)
+def get_user_vault_doc(user_id, document_type):
+    if not user_id:
+        return None
+    record = db.execute(
+        "SELECT * FROM user_vault WHERE user_id = ? AND document_type = ?",
+        (user_id, document_type)
+    )
+    return record[0] if record else None
+
+# 2. Isko Flask me global template function ke taur par register kar dein
+app.add_template_global(get_user_vault_doc, 'get_user_vault_doc')
 
 if __name__ == '__main__':
     app.run(debug=True) 

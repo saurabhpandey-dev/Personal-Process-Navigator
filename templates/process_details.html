@@ -21,47 +21,61 @@
             <!-- Left Column: Checklist & Steps -->
             <div class="space-y">
                 <!-- Required Documents Checklist -->
-                <div class="card">
-                    <h3>&#128194; Required Documents Checklist</h3>
-                    <p class="text-muted text-sm mb-3">Ensure you have digital copies ready in PDF, JPG, or PNG format.</p>
-                    <ul class="checklist-items">
-                        <li>
-                            <label class="checklist-label">
-                                <input type="checkbox" checked disabled> 
-                                <span>Aadhaar Card <small class="text-muted">(Identity Proof)</small></span>
-                            </label>
-                            <span class="badge-status success">Mandatory</span>
-                        </li>
-                        <li>
-                            <label class="checklist-label">
-                                <input type="checkbox" checked disabled> 
-                                <span>PAN Card <small class="text-muted">(Tax Reference)</small></span>
-                            </label>
-                            <span class="badge-status success">Mandatory</span>
-                        </li>
-                        <li>
-                            <label class="checklist-label">
-                                <input type="checkbox"> 
-                                <span>Income Certificate <small class="text-muted">(Issued by competent authority)</small></span>
-                            </label>
-                            <span class="badge-status success">Mandatory</span>
-                        </li>
-                        <li>
-                            <label class="checklist-label">
-                                <input type="checkbox"> 
-                                <span>Marksheet <small class="text-muted">(Academic transcripts)</small></span>
-                            </label>
-                            <span class="badge-status success">Mandatory</span>
-                        </li>
-                        <li>
-                            <label class="checklist-label">
-                                <input type="checkbox"> 
-                                <span>Bank Statement <small class="text-muted">(Last 6 months)</small></span>
-                            </label>
-                            <span class="badge-status success">Mandatory</span>
-                        </li>
-                    </ul>
+                <!-- Required Documents Checklist -->
+<div class="card">
+    <h3>&#128194; Required Documents Checklist</h3>
+    <p class="text-muted text-sm mb-3">Ensure you have digital copies ready in PDF, JPG, or PNG format.</p>
+    
+    <ul class="checklist-items" style="list-style: none; padding: 0;">
+        {% for req in requirements %}
+            <!-- Helper function se check karo kya ye document user ke vault me pehle se hai -->
+            {% set user_doc = get_user_vault_doc(session.get('user_id'), req.document_name) %}
+            
+            <li class="py-3 border-bottom" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-bottom: 15px;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <!-- Document Name & Description -->
+                    <div>
+                        <label class="checklist-label" style="font-weight: bold; font-size: 1.05rem;">
+                            <span>{{ req.document_name }}</span>
+                        </label>
+                        <p class="text-muted text-sm mb-0">{{ req.description }}</p>
+                    </div>
+                    
+                    <!-- Status Badge -->
+                    <div>
+                        {% if user_doc %}
+                            <span class="badge-status success" style="background-color: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✔ Uploaded</span>
+                        {% else %}
+                            <span class="badge-status warning" style="background-color: #fff3cd; color: #664d03; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Pending</span>
+                        {% endif %}
+                    </div>
                 </div>
+
+                <!-- Agar pehle se uploaded hai toh uska link/view dikhao -->
+                {% if user_doc %}
+                    <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span>📄 Saved File: <a href="{{ url_for('static', filename=user_doc.file_path) }}" target="_blank" class="text-primary">{{ user_doc.original_name }}</a></span>
+                        <span class="text-muted small">Uploaded on: {{ user_doc.uploaded_at }}</span>
+                    </div>
+                {% endif %}
+
+                <!-- Upload / Replace Form -->
+                <form action="{{ url_for('upload_vault_doc') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                    <!-- Hidden input taaki backend ko pata chale kis document type ke liye file hai -->
+                    <input type="hidden" name="document_type" value="{{ req.document_name }}">
+                    
+                    <input type="file" name="document_file" class="form-control" style="font-size: 0.9rem;" {% if not user_doc %}required{% endif %}>
+                    
+                    <button class="btn btn-primary" type="submit" style="white-space: nowrap; padding: 6px 14px; font-size: 0.9rem;">
+                        {% if user_doc %} Replace File {% else %} Upload File {% endif %}
+                    </button>
+                </form>
+
+            </li>
+        {% endfor %}
+    </ul>
+</div>
 
                 <!-- Step-by-Step Timeline -->
                 <div class="card">

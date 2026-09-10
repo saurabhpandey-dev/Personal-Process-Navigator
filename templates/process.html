@@ -12,8 +12,10 @@
         <!-- Search & Filter Bar -->
         <div class="process-filter-bar">
             <div class="search-input-wrapper">
-                <span class="search-icon">&#128269;</span>
-                <input type="text" id="processSearch" class="form-control" placeholder="Search processes (e.g., Education Loan, GST)...">
+                <form action="/search_or_create_process" method="post">
+                    <span class="search-icon">&#128269;</span>
+                    <input type="text" id="processSearch" name="process_name" class="form-control" placeholder="Search processes (e.g., Education Loan, GST)...">
+                </form>
             </div>
             <div class="filter-pills">
                 <button class="filter-btn active" data-filter="all">All Processes</button>

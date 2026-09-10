@@ -223,7 +223,13 @@ def search_or_create_process():
 
     if existing: # Agar database me process pehle se mil jata hai
         # naya AI call karne ki zaroorat nahi hai seedha purane process ki ID utha kar uske detail page par redirect kar dega
-        return render_template('process_details.html', process_id=existing[0]['id'])
+        process = existing[0]
+
+        requirements = db.execute(
+            'SELECT * FROM process_requirements WHERE process_id = ?',
+            process['id']
+        )
+        return render_template('process_details.html',process=process,requirements=requirements)
     
     # Agar process database me nahi mila, toh upar banaye gaye 
     # function ko call karke Gemini AI api se naya data fetch karo.

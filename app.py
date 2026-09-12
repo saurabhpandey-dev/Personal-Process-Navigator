@@ -120,9 +120,13 @@ def process_detail(process_id):
     return render_template('process_details.html', process=process, requirements=requirements)
 
 # this route for calling the upload page
+# Yeh route dynamic document upload page ko render karta hai. 
+# URL se process_name aur doc (document type) ko capture karke template par pass karta hai.
 @app.route('/upload')
 def upload():
-    return render_template('upload.html')
+    process_name = request.args.get('process', 'General Process')
+    document_type = request.args.get('doc', 'General Document')
+    return render_template('upload.html', process_name=process_name, document_type=document_type)
 
 @app.route('/profile')
 def profile():
@@ -384,7 +388,7 @@ def upload_vault_doc():
         # Agar pehli baar daal raha hai, toh INSERT kar do
         db.execute(
             "INSERT INTO user_vault (user_id, document_type, original_name, file_path) VALUES (?, ?, ?, ?)",
-            (user_id, document_id if 'document_id' in locals() else None, original_name, db_path) # Adjust as per your columns
+            (user_id, document_type, original_name, db_path) 
         )
         
     return redirect(request.referrer)
@@ -399,6 +403,7 @@ def get_user_vault_doc(user_id, document_type):
         (user_id, document_type)
     )
     return record[0] if record else None
+
 
 # 2. Isko Flask me global template function ke taur par register kar dein
 app.add_template_global(get_user_vault_doc, 'get_user_vault_doc')

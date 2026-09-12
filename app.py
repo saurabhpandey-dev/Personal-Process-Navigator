@@ -1,7 +1,8 @@
 from flask import Flask, render_template,request,redirect,session,jsonify,url_for
 from cs50 import SQL
 import os
-import google.generativeai as genai
+# import google.generativeai as genai
+from google import genai
 from datetime import datetime
 import uuid
 import json
@@ -16,9 +17,12 @@ db = SQL(f'sqlite:///{db_path}')  # database add command
 
 # Gemini API Key Configuretion  
 # (apni API key yahan direct daali hai ya environment variable use kar sakte hain)
-genai.configure(api_key="AAPKI_GEMINI_API_KEY_YAHAN_AAYEGI") # yha pe maine api key dali hai jo ki  'genai.configure' is funtion
+#genai.configure(api_key="AQ.Ab8RN6Icj1Fg_MAWdE7Zv18un_u1Rhapp-_ZMz2cVbGfofUnVA") # yha pe maine api key dali hai jo ki  'genai.configure' is funtion
 # add hogi 
 
+# Genai API Key Configuretion
+# client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6Icj1Fg_MAWdE7Zv18un_u1Rhapp-_ZMz2cVbGfofUnVA"))
+client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6Icj1Fg_MAWdE7Zv18un_u1Rhapp-_ZMz2cVbGfofUnVA"))
 
 @app.route('/')
 def index():
@@ -29,6 +33,7 @@ def index():
 def login():
     return render_template('login.html')
 
+# this route for login the user
 @app.route('/login_user', methods=['POST'])
 def login_user():
     email = request.form.get('email')
@@ -40,11 +45,11 @@ def login_user():
         store_pass = user_exist[0]['password'] # dict ka key hai 'password'
         if store_email == email and store_pass == password:  
             session['email'] = store_email
+            user_id = session.get('user_id', 1)
             return render_template('dashboard.html',user = user_exist[0]) # ye se ham user ka basic data bhejenge 
     # if email or password mismatched got print the error 
     return render_template('login.html', error = 'Email and Password not exist') 
     
-
 
 # this route for calling the user register page
 @app.route('/register')
@@ -143,152 +148,99 @@ def change_password():
 
 # ye function ai ko fatch karegi 
 def fetch_process_data_from_ai(process_name):
-    """
-    Yeh ek custom function hai jo naye process ka naam input leta hai,
-    Gemini AI ko request bhejta hai, aur wahan se JSON data nikal kar return karta hai.
-    """
-    
-    # Gemini ka sabse fast aur text-based tasks ke liye behtareen model select kiya ja raha hai.
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    
-    # Yahan hum AI ko strict instructions (prompt) de rahe hain ki hame data kis format me chahiye.
-    #PROMPT for the search actual data
-    # prompt = f"""
-    # You are an expert government compliance and documentation assistant. 
-    # Provide the details for the process: "{process_name}".
-    
-    # You MUST return the response strictly as a valid JSON object with the following keys and structure:
-    # {{
-    #   "process_name": "{process_name}",
-    #   "description": "A short 1-2 line description of what this process is.",
-    #   "category": "Choose one: Government, Financial, Legal, or Student",
-    #   "total_steps": 3,
-    #   "requirements": [
-    #     {{"name": "Document Name 1", "description": "Short description of why it is needed"}},
-    #     {{"name": "Document Name 2", "description": "Short description"}}
-    #   ]
-    # }}
-    # Do not include any extra text, markdown formatting like ```json, or explanation outside the JSON.
-    # """
-
     prompt = f"""
-        You are an expert real-world process and documentation research assistant.
+You are an expert real-world process and documentation research assistant.
 
-        The user wants to use the Personal Process Navigator application to understand and complete this process:
+The user wants to use the Personal Process Navigator application to understand and complete this process:
 
-        PROCESS NAME:
-        "{process_name}"
+PROCESS NAME:
+"{process_name}"
 
-        Your task is to generate a COMPLETE, PRACTICAL and REAL-WORLD representation of this process.
+Your task is to generate a COMPLETE, PRACTICAL and REAL-WORLD representation of this process.
 
-        IMPORTANT:
-        - Do NOT give only 1 or 2 generic documents.
-        - Identify ALL commonly required documents/information that a real applicant may need for this process.
-        - Include documents related to identity, address, financial information, eligibility, business/student information, photographs, forms, certificates, declarations, authorization, or other relevant requirements ONLY when they are actually applicable to this process.
-        - Do NOT invent documents just to increase the list.
-        - Distinguish between mandatory and optional/supporting documents.
-        - Requirements may vary depending on applicant type, state, authority, organization or specific situation. Mention such variation in the description when relevant.
-        - Provide a COMPLETE step-by-step workflow from eligibility/preparation to final submission/completion.
-        - Do NOT limit the workflow to 3 steps.
-        - Usually provide around 6-12 meaningful steps, but use fewer or more when the real process requires it.
-        - The steps must be logically ordered.
-        - The process should be understandable to a non-technical user.
+IMPORTANT:
+- Do NOT give only 1 or 2 generic documents.
+- Identify ALL commonly required documents/information that a real applicant may need.
+- Include documents related to identity, address, financial information, eligibility, business/student information, photographs, forms, certificates, declarations, authorization, or other relevant requirements ONLY when actually applicable.
+- Do NOT invent documents just to increase the list.
+- Distinguish between mandatory and optional/supporting documents.
+- Requirements may vary depending on applicant type, state, authority, organization or specific situation.
+- Provide a COMPLETE step-by-step workflow.
+- Do NOT limit the workflow to 3 steps.
+- Usually provide around 6-12 meaningful steps.
+- The steps must be logically ordered.
+- The process should be understandable to a non-technical user.
 
-        DOCUMENT REQUIREMENTS:
-        For every relevant document provide:
-        - name
-        - description
-        - is_required (1 for commonly mandatory, 0 for optional/supporting)
+DOCUMENT REQUIREMENTS:
+For every relevant document provide:
+- name
+- description
+- is_required (1 for commonly mandatory, 0 for optional/supporting)
 
-        STEP REQUIREMENTS:
-        For every step provide:
-        - step_number
-        - step_name
-        - description
+STEP REQUIREMENTS:
+For every step provide:
+- step_number
+- step_name
+- description
 
-        RETURN ONLY VALID JSON.
+RETURN ONLY VALID JSON.
 
-        Use exactly this JSON structure:
+Use exactly this JSON structure:
 
+{{
+    "process_name": "{process_name}",
+    "description": "Short but accurate description of the process.",
+    "category": "Choose the most appropriate category: Government, Financial, Legal, Student, Business, or Other",
+    "requirements": [
         {{
-            "process_name": "{process_name}",
-            "description": "Short but accurate description of the process.",
-            "category": "Choose the most appropriate category: Government, Financial, Legal, Student, Business, or Other",
-            "requirements": [
-                {{
-                    "name": "Document name",
-                    "description": "Why it is required and any important condition.",
-                    "is_required": 1
-                }}
-            ],
-            "steps": [
-                {{
-                    "step_number": 1,
-                    "step_name": "Step name",
-                    "description": "Clear explanation of what the user needs to do."
-                }}
-            ]
+            "name": "Document name",
+            "description": "Why it is required and any important condition.",
+            "is_required": 1
         }}
+    ],
+    "steps": [
+        {{
+            "step_number": 1,
+            "step_name": "Step name",
+            "description": "Clear explanation of what the user needs to do."
+        }}
+    ]
+}}
 
-        QUALITY RULES:
-        1. The output must contain the actual requirements relevant to "{process_name}", not generic placeholders.
-        2. Do not return "Identity Proof" and "Application Form" as a substitute for researching the actual requirements.
-        3. Do not assume that every process requires Aadhaar or PAN.
-        4. Do not add irrelevant documents.
-        5. If a document is only required in a particular situation, mark it as optional and explain the condition.
-        6. Include the major official/application forms when applicable.
-        7. Include important supporting documents when they are commonly required.
-        8. Include verification, submission and completion/follow-up steps when applicable.
-        9. Never fabricate official fees, deadlines, eligibility rules, document names or authority requirements.
-        10. Keep the information suitable for an educational/demo application and clearly describe variations where exact requirements depend on the authority or applicant.
+QUALITY RULES:
+1. Output actual requirements relevant to "{process_name}".
+2. Do not use generic placeholders.
+3. Do not assume every process requires Aadhaar or PAN.
+4. Do not add irrelevant documents.
+5. If a document is required only in a particular situation, mark it optional.
+6. Include important official/application forms when applicable.
+7. Include verification, submission and completion/follow-up steps.
+8. Never fabricate official fees, deadlines, eligibility rules, document names or authority requirements.
+9. Keep the information suitable for an educational/demo application.
+10. Return JSON only.
+"""
 
-        Return JSON only. No markdown. No explanation outside JSON.
-    """
-  
-    # try-except block ka use error handling ke liye kiya jata hai taaki 
-    # agar internet ya API me koi dikkat aaye toh app crash na ho.
     try:
-        # model.generate_content() prompt ko AI ke paas bhejta hai aur response generate karta hai.
-        response = model.generate_content(prompt)
-        
-        # response.text se AI ka diya hua text nikalte hain aur .strip() se aage-piche ke extra spaces hata dete hain.
+        # Naye google-genai SDK ka correct syntax
+        response = client.models.generate_content(
+            model='gemini-3.6-flash', # Aap gemini-2.0-flash ya gemini-1.5-flash bhi use kar sakte hain
+            contents=prompt
+        )
+
         text_response = response.text.strip()
-        
-        # Agar AI galti se markdown formatting (jaise ```json ... ```) laga de, toh hum use slice karke saaf kar dete hain.
+
+        # Agar AI markdown code block return kare
         if text_response.startswith("```json"):
             text_response = text_response[7:-3].strip()
         elif text_response.startswith("```"):
             text_response = text_response[3:-3].strip()
-            
-        # json.loads() text/string ko Python Dictionary me badal deta hai taaki hum keys ke zariye data access kar sakein.
+
         data = json.loads(text_response)
-        
-        # Parsed data ko function ke bahar return kar dete hain.
         return data
-        
+
     except Exception as e:
-        # Agar koi bhi error aata hai (jaise internet nahi hai ya AI down hai), toh yeh block chalega.
         print(f"AI Error: {e}")
-
-                # AI fail hone par bhi tumhara app fake 2-document process save kar dega.
-                # Demo ke liye bhi ye problem create karega.
-                # isliye ye galat hai 
-
-        # Fallback data: Agar AI fail ho jaye, toh app ko chalane ke liye ek default dictionary return kar dete hain.
-        # return {
-        #     "process_name": process_name,
-        #     "description": f"Standard workflow for {process_name}.",
-        #     "category": "General",
-        #     "total_steps": 3,
-        #     "requirements": [
-        #         {"name": "Identity Proof", "description": "Standard ID document"},
-        #         {"name": "Application Form", "description": "Filled form"}
-        #     ]
-        # }
-
-        # better :
         return None
-
 # this is route for the search process and create the new process
 @app.route('/search_or_create_process', methods = ['POST'])
 def search_or_create_process():
@@ -318,6 +270,9 @@ def search_or_create_process():
     # toh AI se naya process data fetch karo
     ai_generated_data = fetch_process_data_from_ai(process_name)
 
+    # Smart Fix: Steps ki ginti khud nikal lein taaki KeyError na aaye
+    total_steps_count = len(ai_generated_data.get('steps', []))
+
     # if Ai se data nhi mila to ye pass ho jaiga 
     if not ai_generated_data:
         return render_template(
@@ -331,12 +286,12 @@ def search_or_create_process():
         ai_generated_data['process_name'], 
         ai_generated_data['description'],
         ai_generated_data['category'], 
-        ai_generated_data['total_steps']
+        total_steps_count
     )
     
     # Requirements save karna
     # AI dwara diye gaye saare required documents par ek loop chala rahe hain taaki unhe ek-ek karke save kiya ja sake.
-    for req in ai_generated_data['requirements']:
+    for req in ai_generated_data.get('requirements', []):
         # Har ek document ko 'process_requirements' table me insert kar rahe hain, jiska relation upar wali process ID se hai.
         db.execute(
             "INSERT INTO process_requirements (process_id, document_name, description, is_required) VALUES (?, ?, ?, ?)",
@@ -348,7 +303,7 @@ def search_or_create_process():
                    
     # Steps save karna
     # jo bhi steps ai se mile hai unhe process_steps table me save karna 
-    for step in ai_generated_data['steps']:
+    for step in ai_generated_data.get('steps', []):
         db.execute(
             """
             INSERT INTO process_steps

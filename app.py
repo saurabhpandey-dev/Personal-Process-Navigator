@@ -269,18 +269,25 @@ def fetch_process_data_from_ai(process_name):
     except Exception as e:
         # Agar koi bhi error aata hai (jaise internet nahi hai ya AI down hai), toh yeh block chalega.
         print(f"AI Error: {e}")
-        
+
+                # AI fail hone par bhi tumhara app fake 2-document process save kar dega.
+                # Demo ke liye bhi ye problem create karega.
+                # isliye ye galat hai 
+
         # Fallback data: Agar AI fail ho jaye, toh app ko chalane ke liye ek default dictionary return kar dete hain.
-        return {
-            "process_name": process_name,
-            "description": f"Standard workflow for {process_name}.",
-            "category": "General",
-            "total_steps": 3,
-            "requirements": [
-                {"name": "Identity Proof", "description": "Standard ID document"},
-                {"name": "Application Form", "description": "Filled form"}
-            ]
-        }
+        # return {
+        #     "process_name": process_name,
+        #     "description": f"Standard workflow for {process_name}.",
+        #     "category": "General",
+        #     "total_steps": 3,
+        #     "requirements": [
+        #         {"name": "Identity Proof", "description": "Standard ID document"},
+        #         {"name": "Application Form", "description": "Filled form"}
+        #     ]
+        # }
+
+        # better :
+        return None
 
 # this is route for the search process and create the new process
 @app.route('/search_or_create_process', methods = ['POST'])

@@ -317,7 +317,15 @@ def search_or_create_process():
     ai_generated_data = fetch_process_data_from_ai(process_name)
 
     # AI se mile hue data ko main 'processes' table me insert karna
-    
+    ai_generated_data = fetch_process_data_from_ai(process_name)
+
+    # if Ai se data nhi mila to ye pass ho jaiga 
+    if not ai_generated_data:
+        return render_template(
+            'process.html',
+            error='Process data could not be generated. Please try again.'
+        )
+
     new_process_id  = db.execute(
         "INSERT INTO processes (name, description, category, total_steps) VALUES (?, ?, ?, ?)",
         ai_generated_data['process_name'], ai_generated_data['description'], ai_generated_data['category'], ai_generated_data['total_steps']

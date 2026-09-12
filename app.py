@@ -314,9 +314,8 @@ def search_or_create_process():
     
     # Agar process database me nahi mila, toh upar banaye gaye 
     # function ko call karke Gemini AI api se naya data fetch karo.
-    ai_generated_data = fetch_process_data_from_ai(process_name)
-
-    # AI se mile hue data ko main 'processes' table me insert karna
+    #  Agar process database me nahi mila,
+    # toh AI se naya process data fetch karo
     ai_generated_data = fetch_process_data_from_ai(process_name)
 
     # if Ai se data nhi mila to ye pass ho jaiga 
@@ -326,19 +325,42 @@ def search_or_create_process():
             error='Process data could not be generated. Please try again.'
         )
 
+    # AI se mile data ko processes table me insert karna
     new_process_id  = db.execute(
         "INSERT INTO processes (name, description, category, total_steps) VALUES (?, ?, ?, ?)",
-        ai_generated_data['process_name'], ai_generated_data['description'], ai_generated_data['category'], ai_generated_data['total_steps']
+        ai_generated_data['process_name'], 
+        ai_generated_data['description'],
+        ai_generated_data['category'], 
+        ai_generated_data['total_steps']
     )
     
+    # Requirements save karna
     # AI dwara diye gaye saare required documents par ek loop chala rahe hain taaki unhe ek-ek karke save kiya ja sake.
     for req in ai_generated_data['requirements']:
         # Har ek document ko 'process_requirements' table me insert kar rahe hain, jiska relation upar wali process ID se hai.
         db.execute(
             "INSERT INTO process_requirements (process_id, document_name, description, is_required) VALUES (?, ?, ?, ?)",
-            new_process_id, req['name'], req['description'], 1
-        )
+            new_process_id,
+            req['name'],
+            req['description'],
+            req.get('is_required', 1)
+                    )
                    
+    # Steps save karna
+    # jo bhi steps ai se mile hai unhe process_steps table me save karna 
+    for step in ai_generated_data['steps']:
+        db.execute(
+            """
+            INSERT INTO process_steps
+            (process_id, step_number, step_name, description)
+            VALUES (?, ?, ?, ?)
+            """,
+            new_process_id,
+            step['step_number'],
+            step['step_name'],
+            step['description']
+        )
+
     # Sabhi cheezein database me successfully save hone ke baad, user ko seedha naye process ke detail page par redirect kar do.
     return redirect(url_for('process_detail', process_id=new_process_id))
     

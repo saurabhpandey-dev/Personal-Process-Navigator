@@ -190,3 +190,17 @@ CREATE TABLE IF NOT EXISTS user_vault (
         REFERENCES users(id)
         ON DELETE CASCADE
 );
+
+
+
+CREATE TABLE IF NOT EXISTS process_steps (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    process_id INTEGER NOT NULL,
+    step_number INTEGER NOT NULL,
+    step_name TEXT NOT NULL,
+    description TEXT,
+
+    FOREIGN KEY (process_id)
+        REFERENCES processes(id)
+        ON DELETE CASCADE
+);

@@ -24,7 +24,8 @@ db = SQL(f'sqlite:///{db_path}')  # database add command
 # client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6Icj1Fg_MAWdE7Zv18un_u1Rhapp-_ZMz2cVbGfofUnVA"))
 # client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6K5ETs2u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw"))
 # Line 25 ki jagah ye likhein:
-client = genai.Client(api_key="AQ.Ab8RN6K5ETs2u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw")
+# client = genai.Client(api_key="AQ.Ab8RN6K5ETs2#u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw")
+client = genai.Client(api_key="GEMINI_API_KEY")
 
 @app.route('/')
 def index():
@@ -518,81 +519,80 @@ def change_password():
 # ye function ai ko fatch karegi 
 def fetch_process_data_from_ai(process_name):
     prompt = f"""
-You are an expert real-world process and documentation research assistant.
+    You are an expert real-world process and documentation research assistant.
 
-The user wants to use the Personal Process Navigator application to understand and complete this process:
+    The user wants to use the Personal Process Navigator application to understand and complete this process:
 
-PROCESS NAME:
-"{process_name}"
+    PROCESS NAME:
+    "{process_name}"
 
-Your task is to generate a COMPLETE, PRACTICAL and REAL-WORLD representation of this process.
+    Your task is to generate a COMPLETE, PRACTICAL and REAL-WORLD representation of this process.
 
-IMPORTANT:
-- Do NOT give only 1 or 2 generic documents.
-- Identify ALL commonly required documents/information that a real applicant may need.
-- Include documents related to identity, address, financial information, eligibility, business/student information, photographs, forms, certificates, declarations, authorization, or other relevant requirements ONLY when actually applicable.
-- Do NOT invent documents just to increase the list.
-- Distinguish between mandatory and optional/supporting documents.
-- Requirements may vary depending on applicant type, state, authority, organization or specific situation.
-- Provide a COMPLETE step-by-step workflow.
-- Do NOT limit the workflow to 3 steps.
-- Usually provide around 6-12 meaningful steps.
-- The steps must be logically ordered.
-- The process should be understandable to a non-technical user.
+    IMPORTANT:
+    - Do NOT give only 1 or 2 generic documents.
+    - Identify ALL commonly required documents/information that a real applicant may need.
+    - Include documents related to identity, address, financial information, eligibility, business/student information, photographs, forms, certificates, declarations, authorization, or other relevant requirements ONLY when actually applicable.
+    - Do NOT invent documents just to increase the list.
+    - Distinguish between mandatory and optional/supporting documents.
+    - Requirements may vary depending on applicant type, state, authority, organization or specific situation.
+    - Provide a COMPLETE step-by-step workflow.
+    - Do NOT limit the workflow to 3 steps.
+    - Usually provide around 6-12 meaningful steps.
+    - The steps must be logically ordered.
+    - The process should be understandable to a non-technical user.
 
-DOCUMENT REQUIREMENTS:
-For every relevant document provide:
-- name
-- description
-- is_required (1 for commonly mandatory, 0 for optional/supporting)
+    DOCUMENT REQUIREMENTS:
+    For every relevant document provide:
+    - name
+    - description
+    - is_required (1 for commonly mandatory, 0 for optional/supporting)
 
-STEP REQUIREMENTS:
-For every step provide:
-- step_number
-- step_name
-- description
+    STEP REQUIREMENTS:
+    For every step provide:
+    - step_number
+    - step_name
+    - description
 
-RETURN ONLY VALID JSON.
+    RETURN ONLY VALID JSON.
 
-Use exactly this JSON structure:
+    Use exactly this JSON structure:
 
-{{
-    "process_name": "{process_name}",
-    "description": "Short but accurate description of the process.",
-    "category": "Choose the most appropriate category: Government, Financial, Legal, Student, Business, or Other",
-    "requirements": [
-        {{
-            "name": "Document name",
-            "description": "Why it is required and any important condition.",
-            "is_required": 1
-        }}
-    ],
-    "steps": [
-        {{
-            "step_number": 1,
-            "step_name": "Step name",
-            "description": "Clear explanation of what the user needs to do."
-        }}
-    ]
-}}
+    {{
+        "process_name": "{process_name}",
+        "description": "Short but accurate description of the process.",
+        "category": "Choose the most appropriate category: Government, Financial, Legal, Student, Business, or Other",
+        "requirements": [
+            {{
+                "name": "Document name",
+                "description": "Why it is required and any important condition.",
+                "is_required": 1
+            }}
+        ],
+        "steps": [
+            {{
+                "step_number": 1,
+                "step_name": "Step name",
+                "description": "Clear explanation of what the user needs to do."
+            }}
+        ]
+    }}
 
-QUALITY RULES:
-1. Output actual requirements relevant to "{process_name}".
-2. Do not use generic placeholders.
-3. Do not assume every process requires Aadhaar or PAN.
-4. Do not add irrelevant documents.
-5. If a document is required only in a particular situation, mark it optional.
-6. Include important official/application forms when applicable.
-7. Include verification, submission and completion/follow-up steps.
-8. Never fabricate official fees, deadlines, eligibility rules, document names or authority requirements.
-9. Keep the information suitable for an educational/demo application.
-10. Return JSON only.
-"""
-
+    QUALITY RULES:
+    1. Output actual requirements relevant to "{process_name}".
+    2. Do not use generic placeholders.
+    3. Do not assume every process requires Aadhaar or PAN.
+    4. Do not add irrelevant documents.
+    5. If a document is required only in a particular situation, mark it optional.
+    6. Include important official/application forms when applicable.
+    7. Include verification, submission and completion/follow-up steps.
+    8. Never fabricate official fees, deadlines, eligibility rules, document names or authority requirements.
+    9. Keep the information suitable for an educational/demo application.
+    10. Return JSON only.
+    """
     try:
         # Naye google-genai SDK ka correct syntax
         response = client.models.generate_content(
-            model='gemini-3.6-flash', # Aap gemini-2.0-flash ya gemini-1.5-flash bhi use kar sakte hain
+            model='gemini-3.8-flash', # Aap gemini-2.0-flash ya gemini-1.5-flash bhi use kar sakte hain
             contents=prompt
         )
 
@@ -608,8 +608,11 @@ QUALITY RULES:
         return data
 
     except Exception as e:
-        print(f"AI Error: {e}")
+        print("====================================")
+        print("GEMINI AI ERROR:", repr(e))
+        print("====================================")
         return None
+        
 # this is route for the search process and create the new process
 @app.route('/search_or_create_process', methods = ['GET','POST'])
 def search_or_create_process():
@@ -656,15 +659,14 @@ def search_or_create_process():
     # toh AI se naya process data fetch karo
     ai_generated_data = fetch_process_data_from_ai(process_name)
 
+    # IMPORTANT: # AI agar data nahi de paya toh function None return karega. 
+    # Isliye .get() lagane se PEHLE check karna zaroori hai. 
+    # if Ai se data nhi mila to ye pass ho jaiga 
+    if not ai_generated_data: 
+        return render_template( 'process.html', error='Process data could not be generated. Please try again.' )
+
     # Smart Fix: Steps ki ginti khud nikal lein taaki KeyError na aaye
     total_steps_count = len(ai_generated_data.get('steps', []))
-
-    # if Ai se data nhi mila to ye pass ho jaiga 
-    if not ai_generated_data:
-        return render_template(
-            'process.html',
-            error='Process data could not be generated. Please try again.'
-        )
 
     # steps = ai_generated_data.get('steps', [])
     # requirements_data = ai_generated_data.get('requirements', [])

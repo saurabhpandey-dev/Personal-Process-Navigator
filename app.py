@@ -22,7 +22,9 @@ db = SQL(f'sqlite:///{db_path}')  # database add command
 
 # Genai API Key Configuretion
 # client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6Icj1Fg_MAWdE7Zv18un_u1Rhapp-_ZMz2cVbGfofUnVA"))
-client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6Icj1Fg_MAWdE7Zv18un_u1Rhapp-_ZMz2cVbGfofUnVA"))
+# client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6K5ETs2u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw"))
+# Line 25 ki jagah ye likhein:
+client = genai.Client(api_key="AQ.Ab8RN6K5ETs2u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw")
 
 @app.route('/')
 def index():
@@ -45,7 +47,7 @@ def login_user():
         store_pass = user_exist[0]['password'] # dict ka key hai 'password'
         if store_email == email and store_pass == password:  
             session['email'] = store_email
-            user_id = session.get('user_id', 1)
+            session['user_id'] = user_exist[0]['id']
             return render_template('dashboard.html',user = user_exist[0]) # ye se ham user ka basic data bhejenge 
     # if email or password mismatched got print the error 
     return render_template('login.html', error = 'Email and Password not exist') 
@@ -103,6 +105,23 @@ def logout(): # Logout route: Session clear karke login page par bhejne ke liye
 @app.route('/process')
 def process():
     return render_template('process.html')
+
+# in this function create user new process
+def create_user_process(user_id, process_id):
+    """Create a user-specific process and initialize its tracking steps."""
+
+    # Check if user already has this process
+    existing = db.execute(
+        """
+        SELECT * FROM user_processes
+        WHERE user_id = ? AND process_id = ?
+        """,
+        user_id,
+        process_id
+    )
+
+    if existing:
+        return existing[0]['id']
 
 # this route for calling the process details page
 @app.route('/process/<int:process_id>')
@@ -246,7 +265,7 @@ QUALITY RULES:
         print(f"AI Error: {e}")
         return None
 # this is route for the search process and create the new process
-@app.route('/search_or_create_process', methods = ['POST'])
+@app.route('/search_or_create_process', methods = ['GET','POST'])
 def search_or_create_process():
     process_name = request.form.get('process_name','').strip()
 
@@ -331,9 +350,9 @@ def upload_vault_doc():
     user_id = session.get('user_id', 1) 
     
     # 2. Database se us user ki details (name, email) lena taaki folder name me use kar sakein
-    user_data = db.execute("SELECT id, name, email FROM users WHERE id = ?", (user_id,))
+    user_data = db.execute("SELECT id, name, email FROM users WHERE id = ?", user_id)
     if not user_data:
-        return redirect(url_for('login'))
+        return jsonify({'status': 'error', 'message': 'Not logged in'}), 401
         
     user = user_data[0]
     
@@ -347,7 +366,7 @@ def upload_vault_doc():
     file = request.files.get('document_file')
     
     if not document_type or not file or file.filename == '':
-        return redirect(request.referrer)
+        return jsonify({'status': 'error', 'message': 'Invalid file or type'}), 400
         
     # 4. Document type ka subfolder banana (jaise: 'aadhaar_card')
     safe_doc_folder = document_type.strip().lower().replace(' ', '_')
@@ -375,23 +394,27 @@ def upload_vault_doc():
     # 7. Check karo kya is user ka yeh document pehle se database me hai?
     existing_record = db.execute(
         "SELECT * FROM user_vault WHERE user_id = ? AND document_type = ?", 
-        (user_id, document_type)
+        user_id, document_type
     )
     
     if existing_record:
         # Agar pehle se hai, toh naye path se UPDATE kar do (Purani file replace ho jayegi)
         db.execute(
             "UPDATE user_vault SET file_path = ?, original_name = ?, uploaded_at = CURRENT_TIMESTAMP WHERE user_id = ? AND document_type = ?",
-            (db_path, original_name, user_id, document_type)
+            db_path, original_name, user_id, document_type
         )
     else:
         # Agar pehli baar daal raha hai, toh INSERT kar do
         db.execute(
             "INSERT INTO user_vault (user_id, document_type, original_name, file_path) VALUES (?, ?, ?, ?)",
-            (user_id, document_type, original_name, db_path) 
+            user_id, document_type, original_name, db_path
         )
         
-    return redirect(request.referrer)
+    return jsonify({
+        'status': 'success', 
+        # 'document_type': document_type, 
+        'file_name': original_name
+    })
 
 # Helper function jo check karega ki user ne specific document vault me upload kiya hai ya nahi
 # 1. Yeh function define karein (routes ke aas-pass ya kahin bhi)
@@ -400,7 +423,7 @@ def get_user_vault_doc(user_id, document_type):
         return None
     record = db.execute(
         "SELECT * FROM user_vault WHERE user_id = ? AND document_type = ?",
-        (user_id, document_type)
+        user_id, document_type
     )
     return record[0] if record else None
 

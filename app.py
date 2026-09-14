@@ -160,6 +160,95 @@ def create_user_process(user_id, process_id):
 
     return user_process_id
 
+#this function is for calculate the process track
+def update_process_progress(user_process_id):
+    """Calculate progress from completed tracking steps."""
+
+    process_data = db.execute(
+        """
+        SELECT *
+        FROM user_processes
+        WHERE id = ?
+        """,
+        user_process_id
+    )
+
+    if not process_data:
+        return
+
+    process = process_data[0]
+
+    total_steps = db.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM process_tracking
+        WHERE user_process_id = ?
+        """,
+        user_process_id
+    )[0]['total']
+
+    completed_steps = db.execute(
+        """
+        SELECT COUNT(*) AS completed
+        FROM process_tracking
+        WHERE user_process_id = ?
+        AND status = 'Completed'
+        """,
+        user_process_id
+    )[0]['completed']
+
+    if total_steps == 0:
+        progress = 0
+        current_step = 1
+        status = 'In Progress'
+    else:
+        progress = round((completed_steps / total_steps) * 100)
+
+        if progress >= 100:
+            progress = 100
+            status = 'Completed'
+            current_step = total_steps
+        else:
+            status = 'In Progress'
+
+            current_step_data = db.execute(
+                """
+                SELECT step_number
+                FROM process_tracking
+                WHERE user_process_id = ?
+                AND status != 'Completed'
+                ORDER BY step_number
+                LIMIT 1
+                """,
+                user_process_id
+            )
+
+            current_step = (
+                current_step_data[0]['step_number']
+                if current_step_data
+                else total_steps
+            )
+
+    db.execute(
+        """
+        UPDATE user_processes
+        SET progress = ?,
+            current_step = ?,
+            status = ?,
+            completed_at = CASE
+                WHEN ? = 'Completed' THEN CURRENT_TIMESTAMP
+                ELSE NULL
+            END
+        WHERE id = ?
+        """,
+        progress,
+        current_step,
+        status,
+        status,
+        user_process_id
+    )
+
+
 
 # this route for calling the process details page
 @app.route('/process/<int:process_id>')

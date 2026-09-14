@@ -248,7 +248,32 @@ def update_process_progress(user_process_id):
         user_process_id
     )
 
+def get_user_processes(user_id):
+    """Fetch all processes belonging to the logged-in user."""
 
+    return db.execute(
+        """
+        SELECT
+            up.id AS user_process_id,
+            up.user_id,
+            up.process_id,
+            up.current_step,
+            up.progress,
+            up.status,
+            up.started_at,
+            up.completed_at,
+            p.name AS process_name,
+            p.description,
+            p.category,
+            p.total_steps
+        FROM user_processes up
+        JOIN processes p
+            ON up.process_id = p.id
+        WHERE up.user_id = ?
+        ORDER BY up.started_at DESC
+        """,
+        user_id
+    )
 
 # this route for calling the process details page
 @app.route('/process/<int:process_id>')

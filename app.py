@@ -80,20 +80,99 @@ def create_user():
 @app.route('/dashboard',methods = ["GET",'POST'])
 def dashboard():
     # Agar session me email nahi hai, matlab user ne login nahi kiya
-    if 'email' not in session:
-        return redirect('/login')  # Toh seedha login page par bhej do
+    if 'user_id' not in session:
+        return redirect(url_for('login')) # Toh seedha login page par bhej do
     
-    # Session se email nikal kar database se user ka saara data fetch karenge
-    email = session['email']
-    user_data = db.execute('SELECT * FROM users WHERE email = ?', email)
+    # Session se user_id nikal kar database se user ka saara data fetch karenge
+    user_id = session['user_id']
+    user_data = db.execute(
+        "SELECT * FROM users WHERE id = ?",
+        user_id
+    )
     
     # Safety check: agar user database me nahi mila toh session clear karke login par bhejo
     if not user_data:
         session.clear()
         return redirect('/login')
 
-    # User ka data dashboard template ko bhej denge
-    return render_template('dashboard.html', user=user_data[0])
+    user = user_data[0]
+
+    # Get user's processes
+    user_processes = get_user_processes(user_id)
+
+    # Keep progress/status synchronized
+    for process in user_processes:
+        update_process_progress(process['user_process_id'])
+
+    # Fetch again after updating progress
+    user_processes = get_user_processes(user_id)
+
+    # Active processes
+    active_processes = [
+        p for p in user_processes
+        if p['status'] != 'Completed'
+    ]
+
+    # Completed processes
+    completed_processes = [
+        p for p in user_processes
+        if p['status'] == 'Completed'
+    ]
+
+    # Documents uploaded by this user
+    document_count = db.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM documents d
+        JOIN user_processes up
+            ON d.user_process_id = up.id
+        WHERE up.user_id = ?
+        """,
+        user_id
+    )[0]['total']
+
+    # Verified documents
+    verified_count = db.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM document_verification dv
+        JOIN documents d
+            ON dv.document_id = d.id
+        JOIN user_processes up
+            ON d.user_process_id = up.id
+        WHERE up.user_id = ?
+        AND dv.verification_status = 'Verified'
+        """,
+        user_id
+    )[0]['total']
+
+    # Pending actions = pending process steps
+    pending_actions = db.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM process_tracking pt
+        JOIN user_processes up
+            ON pt.user_process_id = up.id
+        WHERE up.user_id = ?
+        AND pt.status = 'Pending'
+        """,
+        user_id
+    )[0]['total']
+
+    # Process to continue
+    continue_process = active_processes[0] if active_processes else None
+
+    return render_template(
+        'dashboard.html',
+        user=user,
+        user_processes=user_processes,
+        active_processes=active_processes,
+        completed_processes=completed_processes,
+        continue_process=continue_process,
+        document_count=document_count,
+        verified_count=verified_count,
+        pending_actions=pending_actions
+    )
 
 # this route is for logout the user and and the session
 @app.route('/logout')

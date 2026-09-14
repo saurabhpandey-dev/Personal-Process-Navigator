@@ -122,6 +122,44 @@ def create_user_process(user_id, process_id):
 
     if existing:
         return existing[0]['id']
+    
+    # Create user process
+    user_process_id = db.execute(
+        """
+        INSERT INTO user_processes
+        (user_id, process_id, current_step, progress, status)
+        VALUES (?, ?, 1, 0, 'In Progress')
+        """,
+        user_id,
+        process_id
+    )
+
+    # Get all steps of this process
+    steps = db.execute(
+        """
+        SELECT *
+        FROM process_steps
+        WHERE process_id = ?
+        ORDER BY step_number
+        """,
+        process_id
+    )
+
+    # Create tracking entries
+    for step in steps:
+        db.execute(
+            """
+            INSERT INTO process_tracking
+            (user_process_id, step_number, step_name, status)
+            VALUES (?, ?, ?, 'Pending')
+            """,
+            user_process_id,
+            step['step_number'],
+            step['step_name']
+        )
+
+    return user_process_id
+
 
 # this route for calling the process details page
 @app.route('/process/<int:process_id>')

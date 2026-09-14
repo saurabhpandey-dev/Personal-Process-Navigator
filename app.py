@@ -357,6 +357,10 @@ def get_user_processes(user_id):
 # this route for calling the process details page
 @app.route('/process/<int:process_id>')
 def process_detail(process_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
     # Process ki details database se fetch karo
     process_list = db.execute("SELECT * FROM processes WHERE id = ?", process_id)
     if not process_list:
@@ -364,11 +368,122 @@ def process_detail(process_id):
     process = process_list[0]
     
     # Is process ke saare required documents fetch karo
-    requirements = db.execute("SELECT * FROM process_requirements WHERE process_id = ?", process_id)
+    # requirements = db.execute("SELECT * FROM process_requirements WHERE process_id = ?", process_id)
     
     # Template render karte waqt process aur requirements dono pass karo
-    return render_template('process_details.html', process=process, requirements=requirements)
+    # return render_template('process_details.html', process=process, requirements=requirements)
 
+    # Get user's process instance
+    user_process_list = db.execute(
+        """
+        SELECT *
+        FROM user_processes
+        WHERE user_id = ?
+        AND process_id = ?
+        """,
+        user_id,
+        process_id
+    )
+
+    # If user hasn't started this process yet, create it
+    if not user_process_list:
+
+        user_process_id = create_user_process(
+            user_id,
+            process_id
+        )
+
+    else:
+
+        user_process_id = user_process_list[0]['id']
+
+    # Update progress
+    update_process_progress(user_process_id)
+
+    # Fetch updated user process
+    user_process = db.execute(
+        """
+        SELECT *
+        FROM user_processes
+        WHERE id = ?
+        """,
+        user_process_id
+    )[0]
+
+    requirements = db.execute(
+        """
+        SELECT *
+        FROM process_requirements
+        WHERE process_id = ?
+        """,
+        process_id
+    )
+
+    tracking_steps = db.execute(
+        """
+        SELECT *
+        FROM process_tracking
+        WHERE user_process_id = ?
+        ORDER BY step_number
+        """,
+        user_process_id
+    )
+
+    return render_template(
+        'process_details.html',
+        process=process,
+        requirements=requirements,
+        user_process=user_process,
+        tracking_steps=tracking_steps
+    )
+
+@app.route('/complete_step/<int:user_process_id>/<int:step_number>', methods=['POST'])
+def complete_step(user_process_id, step_number):
+
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    # Security check
+    user_process = db.execute(
+        """
+        SELECT *
+        FROM user_processes
+        WHERE id = ?
+        AND user_id = ?
+        """,
+        user_process_id,
+        user_id
+    )
+
+    if not user_process:
+        return redirect(url_for('dashboard'))
+
+    # Mark step completed
+    db.execute(
+        """
+        UPDATE process_tracking
+        SET status = 'Completed',
+            updated_at = CURRENT_TIMESTAMP
+        WHERE user_process_id = ?
+        AND step_number = ?
+        """,
+        user_process_id,
+        step_number
+    )
+
+    # Recalculate progress
+    update_process_progress(user_process_id)
+
+    process_id = user_process[0]['process_id']
+
+    return redirect(
+        url_for(
+            'process_detail',
+            process_id=process_id
+        )
+    )
 # this route for calling the upload page
 # Yeh route dynamic document upload page ko render karta hai. 
 # URL se process_name aur doc (document type) ko capture karke template par pass karta hai.
@@ -498,6 +613,9 @@ QUALITY RULES:
 # this is route for the search process and create the new process
 @app.route('/search_or_create_process', methods = ['GET','POST'])
 def search_or_create_process():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     process_name = request.form.get('process_name','').strip()
 
     # agar user ne bina likhe search button bda diya to process_list pe chala jaiga
@@ -506,7 +624,8 @@ def search_or_create_process():
     
     # Database me check kar rahe hain ki kya yeh process pehle se database me maujood hai ya nahi.
     existing = db.execute('select * from processes where lower(name) like ?', ('%' + process_name.lower() + '%',))
-    # lower(name) ka use isliye kiya hai taaki uppercase/lowercase ki koi problem na ho.
+    # lower(name) ka use isliye kiya 
+    # hai taaki uppercase/lowercase ki koi problem na ho.
 
     if existing: # Agar database me process pehle se mil jata hai
         # naya AI call karne ki zaroorat nahi hai seedha purane process ki ID utha kar uske detail page par redirect kar dega
@@ -516,7 +635,20 @@ def search_or_create_process():
             'SELECT * FROM process_requirements WHERE process_id = ?',
             process['id']
         )
-        return render_template('process_details.html',process=process,requirements=requirements)
+        # Start process for this user
+        user_process_id = create_user_process(
+            user_id,
+            process['id']
+        )
+
+        update_process_progress(user_process_id)
+
+        return redirect(
+            url_for(
+                'process_detail',
+                process_id=process['id']
+            )
+        )
     
     # Agar process database me nahi mila, toh upar banaye gaye 
     # function ko call karke Gemini AI api se naya data fetch karo.
@@ -533,6 +665,11 @@ def search_or_create_process():
             'process.html',
             error='Process data could not be generated. Please try again.'
         )
+
+    # steps = ai_generated_data.get('steps', [])
+    # requirements_data = ai_generated_data.get('requirements', [])
+
+    # total_steps_count = len(steps)   
 
     # AI se mile data ko processes table me insert karna
     new_process_id  = db.execute(
@@ -569,6 +706,14 @@ def search_or_create_process():
             step['step_name'],
             step['description']
         )
+
+    # Create user's process instance
+    user_process_id = create_user_process(
+        user_id,
+        new_process_id
+    )
+
+    update_process_progress(user_process_id)
 
     # Sabhi cheezein database me successfully save hone ke baad, user ko seedha naye process ke detail page par redirect kar do.
     return redirect(url_for('process_detail', process_id=new_process_id))

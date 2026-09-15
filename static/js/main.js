@@ -358,3 +358,100 @@ async function uploadDocument(event, formElement) {
         submitBtn.disabled = false;
     }
 }
+
+document.addEventListener("submit", async function(e) {
+    // Check karo kya submit hone wala form apna .ajax-upload-form hai?
+    if (!e.target.classList.contains('ajax-upload-form')) return;
+    
+    // Page reload rokne ke liye sabse pehle yeh
+    e.preventDefault(); 
+    
+    const form = e.target;
+    const fileField = form.querySelector('input[type="file"]');
+    const statusSpan = form.querySelector('.upload-status');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const li = form.closest('li');
+
+    if (fileField && !fileField.files.length) {
+        alert('Please select a file first.');
+        return;
+    }
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusSpan) {
+        statusSpan.innerHTML = '⏳ Uploading...';
+        statusSpan.style.color = '#6c757d';
+    }
+
+    const formData = new FormData(form);
+
+    try {
+        let response = await fetch('/upload_vault_doc', {
+            method: 'POST',
+            body: formData
+        });
+
+        let rawText = await response.text();
+        let result;
+        try {
+            result = JSON.parse(rawText);
+        } catch (jsonErr) {
+            console.error("Non-JSON response from server:", rawText);
+            throw new Error("Server did not return JSON");
+        }
+
+        console.log("Parsed Result:", result);
+
+        if (response.ok && result.status === 'success') {
+            if (statusSpan) {
+                statusSpan.innerHTML = `✅ Done!`;
+                statusSpan.style.color = '#198754';
+            }
+
+            // Target container dhoondo ya banao
+            let targetArea = li ? li : form.parentElement;
+            
+            // Status badge update/inject
+            let statusBadge = targetArea.querySelector('.doc-status-container');
+            const badgeHtml = `<span style="background-color: #d1e7dd; color: #0f5132; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">✔ Uploaded</span>`;
+            
+            if (statusBadge) {
+                statusBadge.innerHTML = badgeHtml;
+            } else {
+                form.insertAdjacentHTML('beforebegin', `<div class="doc-status-container" style="margin-bottom: 8px;">${badgeHtml}</div>`);
+            }
+
+            // Preview block update/inject
+            let previewBlock = targetArea.querySelector('.file-preview-block');
+            let fileName = (fileField && fileField.files[0]) ? fileField.files[0].name : (result.file_name || 'Uploaded File');
+            let previewHtml = `
+                <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span>📄 Saved File: <strong>${fileName}</strong></span>
+                    <span class="text-muted small">Just now</span>
+                </div>
+            `;
+
+            if (previewBlock) {
+                previewBlock.innerHTML = previewHtml;
+            } else {
+                form.insertAdjacentHTML('beforebegin', `<div class="file-preview-block">${previewHtml}</div>`);
+            }
+
+            if (submitBtn) submitBtn.innerHTML = 'Replace File';
+
+        } else {
+            if (statusSpan) {
+                statusSpan.innerHTML = `❌ ${result.message || 'Failed'}`;
+                statusSpan.style.color = 'red';
+            }
+        }
+    } catch (err) {
+        console.error("Upload error details:", err);
+        if (statusSpan) {
+            statusSpan.innerHTML = `❌ Error`;
+            statusSpan.style.color = 'red';
+        }
+    } finally {
+        if (submitBtn) submitBtn.disabled = false;
+    }
+});

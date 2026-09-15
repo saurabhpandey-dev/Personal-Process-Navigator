@@ -25,11 +25,40 @@ db = SQL(f'sqlite:///{db_path}')  # database add command
 # client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6K5ETs2u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw"))
 # Line 25 ki jagah ye likhein:
 # client = genai.Client(api_key="AQ.Ab8RN6K5ETs2#u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw")
-client = genai.Client(api_key="GEMINI_API_KEY")
+client = genai.Client(api_key="AQ.Ab8RN6IJnIX5xueO6ckdoPYPfX2I5MbNyen8liNtD2RJ3zxzsg")
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # return render_template('index.html')
+    processes = db.execute("""
+        SELECT
+            id,
+            name,
+            description,
+            category,
+            total_steps,
+            image_path
+        FROM processes
+        ORDER BY id ASC
+    """)
+
+    user = None
+
+    if session.get("user_id"):
+
+        user = db.execute(
+            "SELECT * FROM users WHERE id = ?",
+            session["user_id"]
+        )
+
+        if user:
+            user = user[0]
+
+    return render_template(
+        "index.html",
+        processes=processes,
+        user=user
+    )
 
 # this route for calling ther user login page
 @app.route('/login')
@@ -80,47 +109,143 @@ def create_user():
 # Dashboard route: Ye check karega ki user login hai ya nahi, tabhi khulega
 @app.route('/dashboard',methods = ["GET",'POST'])
 def dashboard():
-    # Agar session me email nahi hai, matlab user ne login nahi kiya
-    if 'user_id' not in session:
-        return redirect(url_for('login')) # Toh seedha login page par bhej do
+    # # Agar session me email nahi hai, matlab user ne login nahi kiya
+    # if 'user_id' not in session:
+    #     return redirect(url_for('login')) # Toh seedha login page par bhej do
     
-    # Session se user_id nikal kar database se user ka saara data fetch karenge
+    # # Session se user_id nikal kar database se user ka saara data fetch karenge
+    # user_id = session['user_id']
+    # user_data = db.execute(
+    #     "SELECT * FROM users WHERE id = ?",
+    #     user_id
+    # )
+    
+    # # Safety check: agar user database me nahi mila toh session clear karke login par bhejo
+    # if not user_data:
+    #     session.clear()
+    #     return redirect('/login')
+
+    # user = user_data[0]
+
+    # # Get user's processes
+    # user_processes = get_user_processes(user_id)
+
+    # # Keep progress/status synchronized
+    # for process in user_processes:
+    #     update_process_progress(process['user_process_id'])
+
+    # # Fetch again after updating progress
+    # user_processes = get_user_processes(user_id)
+
+    # # Active processes
+    # active_processes = [
+    #     p for p in user_processes
+    #     if p['status'] != 'Completed'
+    # ]
+
+    # # Completed processes
+    # completed_processes = [
+    #     p for p in user_processes
+    #     if p['status'] == 'Completed'
+    # ]
+
+    # # Documents uploaded by this user
+    # document_count = db.execute(
+    #     """
+    #     SELECT COUNT(*) AS total
+    #     FROM documents d
+    #     JOIN user_processes up
+    #         ON d.user_process_id = up.id
+    #     WHERE up.user_id = ?
+    #     """,
+    #     user_id
+    # )[0]['total']
+
+    # # Verified documents
+    # verified_count = db.execute(
+    #     """
+    #     SELECT COUNT(*) AS total
+    #     FROM document_verification dv
+    #     JOIN documents d
+    #         ON dv.document_id = d.id
+    #     JOIN user_processes up
+    #         ON d.user_process_id = up.id
+    #     WHERE up.user_id = ?
+    #     AND dv.verification_status = 'Verified'
+    #     """,
+    #     user_id
+    # )[0]['total']
+
+    # # Pending actions = pending process steps
+    # pending_actions = db.execute(
+    #     """
+    #     SELECT COUNT(*) AS total
+    #     FROM process_tracking pt
+    #     JOIN user_processes up
+    #         ON pt.user_process_id = up.id
+    #     WHERE up.user_id = ?
+    #     AND pt.status = 'Pending'
+    #     """,
+    #     user_id
+    # )[0]['total']
+
+    # # Process to continue
+    # continue_process = active_processes[0] if active_processes else None
+
+    # return render_template(
+    #     'dashboard.html',
+    #     user=user,
+    #     user_processes=user_processes,
+    #     active_processes=active_processes,
+    #     completed_processes=completed_processes,
+    #     continue_process=continue_process,
+    #     document_count=document_count,
+    #     verified_count=verified_count,
+    #     pending_actions=pending_actions
+    # )
+
+    # Check kar rahe hain ki user login hai ya nahi
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     user_id = session['user_id']
+
+    # Logged-in user ka data database se nikal rahe hain
     user_data = db.execute(
         "SELECT * FROM users WHERE id = ?",
         user_id
     )
-    
-    # Safety check: agar user database me nahi mila toh session clear karke login par bhejo
+
+    # Agar user database me nahi mila toh login par bhej denge
     if not user_data:
         session.clear()
-        return redirect('/login')
+        return redirect(url_for('login'))
 
     user = user_data[0]
 
-    # Get user's processes
+    # User ke saare processes database se la rahe hain
     user_processes = get_user_processes(user_id)
 
-    # Keep progress/status synchronized
-    for process in user_processes:
-        update_process_progress(process['user_process_id'])
+    # Har process ka progress dobara calculate kar rahe hain
+    for p in user_processes:
+        update_process_progress(p['user_process_id'])
 
-    # Fetch again after updating progress
+    # Updated data dobara fetch kar rahe hain
     user_processes = get_user_processes(user_id)
 
-    # Active processes
+    # Jo process complete nahi hua wahi active process hai
     active_processes = [
         p for p in user_processes
         if p['status'] != 'Completed'
     ]
 
-    # Completed processes
+    # Completed processes alag kar rahe hain
     completed_processes = [
         p for p in user_processes
         if p['status'] == 'Completed'
     ]
 
-    # Documents uploaded by this user
+    # User ne kitne documents upload kiye hain
     document_count = db.execute(
         """
         SELECT COUNT(*) AS total
@@ -132,7 +257,7 @@ def dashboard():
         user_id
     )[0]['total']
 
-    # Verified documents
+    # Kitne documents verified hain
     verified_count = db.execute(
         """
         SELECT COUNT(*) AS total
@@ -147,7 +272,7 @@ def dashboard():
         user_id
     )[0]['total']
 
-    # Pending actions = pending process steps
+    # Kitne steps abhi pending hain
     pending_actions = db.execute(
         """
         SELECT COUNT(*) AS total
@@ -160,19 +285,61 @@ def dashboard():
         user_id
     )[0]['total']
 
-    # Process to continue
+    # Sabse recent active process ko continue process bana rahe hain
     continue_process = active_processes[0] if active_processes else None
+
+    # Next action ke liye default None
+    next_action = None
+
+    if continue_process:
+
+        # Current pending step nikal rahe hain
+        current_step = db.execute(
+            """
+            SELECT *
+            FROM process_tracking
+            WHERE user_process_id = ?
+            AND status = 'Pending'
+            ORDER BY step_number
+            LIMIT 1
+            """,
+            continue_process['user_process_id']
+        )
+
+        if current_step:
+
+            step = current_step[0]
+
+            # Dashboard ke Next Action card ke liye data
+            next_action = {
+                'title': step['step_name'],
+                'description': 'Complete this step to continue your process.',
+                'process_name': continue_process['process_name'],
+                'process_id': continue_process['process_id'],
+                'step_number': step['step_number']
+            }
 
     return render_template(
         'dashboard.html',
+
+        # User information
         user=user,
+
+        # Process data
         user_processes=user_processes,
         active_processes=active_processes,
         completed_processes=completed_processes,
+
+        # Continue process
         continue_process=continue_process,
+
+        # Dashboard statistics
         document_count=document_count,
         verified_count=verified_count,
-        pending_actions=pending_actions
+        pending_actions=pending_actions,
+
+        # Next action
+        next_action=next_action
     )
 
 # this route is for logout the user and and the session
@@ -592,7 +759,7 @@ def fetch_process_data_from_ai(process_name):
     try:
         # Naye google-genai SDK ka correct syntax
         response = client.models.generate_content(
-            model='gemini-3.8-flash', # Aap gemini-2.0-flash ya gemini-1.5-flash bhi use kar sakte hain
+            model='gemini-2.5-flash', # Aap gemini-2.0-flash ya gemini-1.5-flash bhi use kar sakte hain
             contents=prompt
         )
 
@@ -616,9 +783,11 @@ def fetch_process_data_from_ai(process_name):
 # this is route for the search process and create the new process
 @app.route('/search_or_create_process', methods = ['GET','POST'])
 def search_or_create_process():
+    
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    u_id = session['user_id']
     process_name = request.form.get('process_name','').strip()
 
     # agar user ne bina likhe search button bda diya to process_list pe chala jaiga
@@ -640,7 +809,7 @@ def search_or_create_process():
         )
         # Start process for this user
         user_process_id = create_user_process(
-            user_id,
+            u_id,
             process['id']
         )
 

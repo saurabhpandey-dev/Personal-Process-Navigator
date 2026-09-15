@@ -6,649 +6,698 @@
 
 <div class="dashboard-wrapper">
 
-```
-<!-- ================= SIDEBAR ================= -->
+    <!-- ================= SIDEBAR ================= -->
 
-<aside class="dashboard-sidebar">
+    <aside class="dashboard-sidebar">
 
-    <div class="sidebar-user">
+        <div class="sidebar-user">
 
-        <div class="avatar-circle">
-            {{ user.name[0] | upper if user and user.name else 'U' }}
+            <div class="avatar-circle">
+                {{ user.name[0] | upper if user and user.name else 'U' }}
+            </div>
+
+            <div>
+                <strong>
+                    {{ user.name if user else 'Guest User' }}
+                </strong>
+
+                <span>MCA Student</span>
+
+                <span>
+                    ID #{{ user.id if user else '2026' }}
+                </span>
+            </div>
+
         </div>
 
-        <div>
-            <strong>
-                {{ user.name if user else 'Guest User' }}
-            </strong>
 
-            <span>MCA Student ID</span>
+        <ul class="sidebar-nav">
 
-            <span>
-                #{{ user.id if user else '2026' }}
-            </span>
+            <li>
+                <a href="{{ url_for('dashboard') }}" class="active">
+                    &#127968; Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('process') }}">
+                    &#128193; My Processes
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('upload') }}">
+                    &#128196; Documents
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('process') }}">
+                    &#128737; Verification
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('profile') }}">
+                    &#9881; Profile
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    &#128274; Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+
+    <!-- ================= MAIN DASHBOARD ================= -->
+
+    <main class="dashboard-main">
+
+
+        <!-- ================= HEADER ================= -->
+
+        <div class="dashboard-header">
+
+            <h1>
+                Good Morning,
+                {{ user.name.split()[0] if user and user.name else 'User' }}
+            </h1>
+
+            <p>
+                Here is the current standing of your administrative workflows.
+            </p>
+
         </div>
 
-    </div>
 
 
-    <ul class="sidebar-nav">
+        <!-- ================= CONTINUE PROCESS ================= -->
 
-        <li>
-            <a href="{{ url_for('dashboard') }}" class="active">
-                &#127968; Dashboard
-            </a>
-        </li>
+        <div class="card continue-card">
 
-        <li>
-            <a href="{{ url_for('process') }}">
-                &#128193; My Processes
-            </a>
-        </li>
+            {% if continue_process %}
 
-        <li>
-            <a href="{{ url_for('upload') }}">
-                &#128196; Documents
-            </a>
-        </li>
+                <div class="continue-info">
 
-        <li>
-            <a href="{{ url_for('process') }}">
-                &#128737; Verification
-            </a>
-        </li>
+                    <span class="badge-pill success-badge">
+                        {{ continue_process.status }}
+                    </span>
 
-        <li>
-            <a href="{{ url_for('profile') }}">
-                &#9881; Profile
-            </a>
-        </li>
+                    <h3>
+                        Continue Your Process
+                    </h3>
 
-    </ul>
+                    <p>
+                        <strong>Process:</strong>
+                        {{ continue_process.process_name }}
+                    </p>
 
-</aside>
+                    <p>
+                        <strong>Current Step:</strong>
+
+                        {{ continue_process.current_step }}
+
+                        of
+
+                        {{ continue_process.total_steps }}
+                    </p>
 
 
-<!-- ================= MAIN DASHBOARD ================= -->
+                    <!-- Dynamic Progress -->
 
-<main class="dashboard-main">
+                    <div class="progress-track mt-3">
 
+                        <div
+                            class="progress-fill"
+                            style="width: {{ continue_process.progress }}%;">
+                        </div>
 
-    <!-- HEADER -->
+                    </div>
 
-    <div class="dashboard-header">
+                    <span class="progress-text">
+                        {{ continue_process.progress }}% Completed
+                    </span>
 
-        <h1>
-            Good Morning,
-            {{ user.name.split()[0] if user and user.name else 'User' }}
-        </h1>
-
-        <p>
-            Here is the current standing of your active administrative workflows.
-        </p>
-
-    </div>
+                </div>
 
 
+                <div>
 
-    <!-- ================= CONTINUE PROCESS ================= -->
+                    <a
+                        href="{{ url_for(
+                            'process_detail',
+                            process_id=continue_process.process_id
+                        ) }}"
+                        class="btn btn-primary">
 
-    <div class="card continue-card">
+                        Continue Process &rarr;
 
-        {% if continue_process %}
+                    </a>
 
-            <div class="continue-info">
+                </div>
 
-                <span class="badge-pill success-badge">
-                    {{ continue_process.status }}
+
+            {% else %}
+
+                <!-- No active process -->
+
+                <div class="continue-info">
+
+                    <span class="badge-pill">
+                        No Active Process
+                    </span>
+
+                    <h3>
+                        Start Your First Process
+                    </h3>
+
+                    <p>
+                        Choose a process and let Personal Process Navigator
+                        guide you step-by-step.
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <a
+                        href="{{ url_for('process') }}"
+                        class="btn btn-primary">
+
+                        Explore Processes &rarr;
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- ================= DASHBOARD STATS ================= -->
+
+        <div class="dash-stats-grid">
+
+
+            <!-- Active Processes -->
+
+            <div class="dash-stat-box">
+
+                <span class="dash-icon text-primary">
+                    &#128202;
                 </span>
 
+                <div>
 
-                <h3>
-                    Continue Your Process
-                </h3>
+                    <h4>
+                        {{ active_processes | length }}
+                    </h4>
 
+                    <p>
+                        Active Processes
+                    </p>
 
-                <p>
-                    <strong>Process:</strong>
-                    {{ continue_process.process_name }}
-                </p>
+                </div>
 
-
-                <p>
-                    <strong>Current Step:</strong>
-
-                    {% if continue_process.current_step %}
-                        {{ continue_process.current_step }}
-                    {% else %}
-                        -
-                    {% endif %}
-
-                    of
-
-                    {{ continue_process.total_steps }}
-                </p>
+            </div>
 
 
-                <!-- Progress database se aa raha hai -->
-                <div class="progress-track mt-3">
 
-                    <div
-                        class="progress-fill"
-                        style="width: {{ continue_process.progress }}%;">
+            <!-- Documents -->
+
+            <div class="dash-stat-box">
+
+                <span class="dash-icon text-accent">
+                    &#128194;
+                </span>
+
+                <div>
+
+                    <h4>
+                        {{ document_count }}
+                    </h4>
+
+                    <p>
+                        Documents Uploaded
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Verified Documents -->
+
+            <div class="dash-stat-box">
+
+                <span class="dash-icon text-success">
+                    &#9745;
+                </span>
+
+                <div>
+
+                    <h4>
+                        {{ verified_count }}
+                    </h4>
+
+                    <p>
+                        Verified Documents
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Pending Actions -->
+
+            <div class="dash-stat-box">
+
+                <span class="dash-icon text-warning">
+                    &#9888;
+                </span>
+
+                <div>
+
+                    <h4>
+                        {{ pending_actions }}
+                    </h4>
+
+                    <p>
+                        Pending Actions
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= LOWER DASHBOARD ================= -->
+
+        <div class="dash-grid-2">
+
+
+            <!-- ================= LEFT COLUMN ================= -->
+
+            <div class="space-y">
+
+
+                <!-- ================= ACTIVE PROCESSES ================= -->
+
+                <div class="card">
+
+                    <h3>
+                        Your Active Processes
+                    </h3>
+
+
+                    <div class="process-item-list">
+
+
+                        {% if active_processes %}
+
+
+                            {% for p in active_processes %}
+
+                                <div class="process-list-row">
+
+
+                                    <div>
+
+                                        <strong>
+                                            {{ p.process_name }}
+                                        </strong>
+
+                                        <span>
+                                            {{ p.status }}
+                                        </span>
+
+                                        <span>
+                                            Step {{ p.current_step }}
+                                            of
+                                            {{ p.total_steps }}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="align-right">
+
+
+                                        <span class="text-accent font-semibold">
+                                            {{ p.progress }}%
+                                        </span>
+
+
+                                        <div class="mini-track">
+
+                                            <div
+                                                class="mini-fill"
+                                                style="width: {{ p.progress }}%;">
+                                            </div>
+
+                                        </div>
+
+
+                                        <a
+                                            href="{{ url_for(
+                                                'process_detail',
+                                                process_id=p.process_id
+                                            ) }}"
+                                            class="text-link">
+
+                                            Continue &rarr;
+
+                                        </a>
+
+                                    </div>
+
+
+                                </div>
+
+                            {% endfor %}
+
+
+                        {% else %}
+
+
+                            <div class="text-muted">
+
+                                <p>
+                                    No active processes yet.
+                                </p>
+
+                                <a
+                                    href="{{ url_for('process') }}"
+                                    class="btn btn-primary mt-3">
+
+                                    Start a Process
+
+                                </a>
+
+                            </div>
+
+
+                        {% endif %}
+
                     </div>
 
                 </div>
 
 
-                <span class="progress-text">
-                    {{ continue_process.progress }}% Completed
-                </span>
 
-            </div>
+                <!-- ================= COMPLETED PROCESSES ================= -->
 
+                <div class="card">
 
-            <div>
+                    <h3>
+                        Completed Processes
+                    </h3>
 
-                <a
-                    href="{{ url_for(
-                        'process_detail',
-                        process_id=continue_process.process_id
-                    ) }}"
-                    class="btn btn-primary">
 
-                    Continue Process &rarr;
+                    {% if completed_processes %}
 
-                </a>
+                        <div class="process-item-list">
 
-            </div>
+                            {% for p in completed_processes %}
 
+                                <div class="process-list-row">
 
-        {% else %}
+                                    <div>
 
+                                        <strong>
+                                            {{ p.process_name }}
+                                        </strong>
 
-            <!-- Agar user ne abhi koi process start nahi kiya -->
-
-            <div class="continue-info">
-
-                <span class="badge-pill">
-                    No Active Process
-                </span>
-
-                <h3>
-                    Start a Process
-                </h3>
-
-                <p>
-                    You don't have any active process right now.
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <a
-                    href="{{ url_for('process') }}"
-                    class="btn btn-primary">
-
-                    Explore Processes &rarr;
-
-                </a>
-
-            </div>
-
-
-        {% endif %}
-
-    </div>
-
-
-
-    <!-- ================= DASHBOARD STATS ================= -->
-
-    <div class="dash-stats-grid">
-
-
-        <!-- Active Processes -->
-
-        <div class="dash-stat-box">
-
-            <span class="dash-icon text-primary">
-                &#128202;
-            </span>
-
-            <div>
-
-                <h4>
-                    {{ active_processes | length }}
-                </h4>
-
-                <p>
-                    Active Processes
-                </p>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- Uploaded Documents -->
-
-        <div class="dash-stat-box">
-
-            <span class="dash-icon text-accent">
-                &#128194;
-            </span>
-
-            <div>
-
-                <h4>
-                    {{ document_count }}
-                </h4>
-
-                <p>
-                    Documents Uploaded
-                </p>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- Verified Documents -->
-
-        <div class="dash-stat-box">
-
-            <span class="dash-icon text-success">
-                &#9745;
-            </span>
-
-            <div>
-
-                <h4>
-                    {{ verified_count }}
-                </h4>
-
-                <p>
-                    Verified Documents
-                </p>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- Pending Actions -->
-
-        <div class="dash-stat-box">
-
-            <span class="dash-icon text-warning">
-                &#9888;
-            </span>
-
-            <div>
-
-                <h4>
-                    {{ pending_actions }}
-                </h4>
-
-                <p>
-                    Pending Actions
-                </p>
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- ================= LOWER DASHBOARD ================= -->
-
-    <div class="dash-grid-2">
-
-
-        <div class="space-y">
-
-
-            <!-- ================= ACTIVE PROCESSES ================= -->
-
-            <div class="card">
-
-                <h3>
-                    Your Active Processes
-                </h3>
-
-
-                <div class="process-item-list">
-
-
-                    {% if active_processes %}
-
-
-                        {% for p in active_processes %}
-
-                            <div class="process-list-row">
-
-
-                                <div>
-
-                                    <strong>
-                                        {{ p.process_name }}
-                                    </strong>
-
-                                    <span>
-                                        Status: {{ p.status }}
-                                    </span>
-
-                                </div>
-
-
-                                <div class="align-right">
-
-                                    <span class="text-accent font-semibold">
-                                        {{ p.progress }}%
-                                    </span>
-
-
-                                    <div class="mini-track">
-
-                                        <div
-                                            class="mini-fill"
-                                            style="width: {{ p.progress }}%;">
-                                        </div>
+                                        <span>
+                                            Completed
+                                        </span>
 
                                     </div>
 
 
-                                    <a
-                                        href="{{ url_for(
-                                            'process_detail',
-                                            process_id=p.process_id
-                                        ) }}"
-                                        class="text-link">
+                                    <div class="align-right">
 
-                                        Continue &rarr;
+                                        <span class="text-success font-semibold">
+                                            100%
+                                        </span>
 
-                                    </a>
+                                        <a
+                                            href="{{ url_for(
+                                                'process_detail',
+                                                process_id=p.process_id
+                                            ) }}"
+                                            class="text-link">
+
+                                            View &rarr;
+
+                                        </a>
+
+                                    </div>
 
                                 </div>
 
+                            {% endfor %}
 
-                            </div>
+                        </div>
 
-                        {% endfor %}
+                    {% else %}
+
+                        <p class="text-muted">
+                            No process has been completed yet.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ================= RIGHT COLUMN ================= -->
+
+            <div>
+
+
+                <!-- ================= PROCESS SUMMARY ================= -->
+
+                <div class="card alert-highlight-card">
+
+                    <div class="alert-header">
+
+                        <span class="text-warning">
+                            &#9888;
+                        </span>
+
+                        <h3>
+                            Current Action
+                        </h3>
+
+                    </div>
+
+
+                    {% if continue_process %}
+
+                        <h4>
+                            Continue {{ continue_process.process_name }}
+                        </h4>
+
+                        <p class="issue-box">
+
+                            <strong>
+                                Next Step:
+                            </strong>
+
+                            Step
+                            {{ continue_process.current_step }}
+                            of
+                            {{ continue_process.total_steps }}
+
+                            is currently active.
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Progress:
+                            </strong>
+
+                            {{ continue_process.progress }}%
+
+                        </p>
+
+
+                        <a
+                            href="{{ url_for(
+                                'process_detail',
+                                process_id=continue_process.process_id
+                            ) }}"
+                            class="btn btn-warning btn-full mt-4">
+
+                            Continue Process
+
+                        </a>
 
 
                     {% else %}
 
 
-                        <p class="text-muted">
-                            No active processes yet.
+                        <h4>
+                            No Active Process
+                        </h4>
+
+
+                        <p class="issue-box">
+
+                            You currently don't have any active process.
+                            Start a process to begin your guided workflow.
+
                         </p>
 
 
                         <a
                             href="{{ url_for('process') }}"
-                            class="btn btn-primary mt-3">
+                            class="btn btn-primary btn-full mt-4">
 
-                            Start a Process
+                            Explore Processes
 
                         </a>
 
 
                     {% endif %}
 
+                </div>
+
+
+
+                <!-- ================= QUICK OVERVIEW ================= -->
+
+                <div class="card">
+
+                    <h3>
+                        Your Activity
+                    </h3>
+
+
+                    <div class="activity-list">
+
+
+                        <div class="activity-item">
+
+                            <span class="text-accent">
+                                &#128196;
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Documents
+                                </strong>
+
+                                <span>
+                                    {{ document_count }}
+                                    document(s) uploaded
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="activity-item">
+
+                            <span class="text-success">
+                                &#9745;
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Verification
+                                </strong>
+
+                                <span>
+                                    {{ verified_count }}
+                                    document(s) verified
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="activity-item">
+
+                            <span class="text-warning">
+                                &#9888;
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Pending Actions
+                                </strong>
+
+                                <span>
+                                    {{ pending_actions }}
+                                    step(s) pending
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
 
                 </div>
 
-            </div>
 
 
+                <!-- ================= START PROCESS ================= -->
 
-            <!-- ================= RECENT DOCUMENT ACTIVITY ================= -->
+                {% if not active_processes %}
 
-            <div class="card">
+                    <div class="card">
 
-                <h3>
-                    Recent Document Activity
-                </h3>
+                        <h3>
+                            Ready to Get Started?
+                        </h3>
 
-
-                {% if recent_documents %}
-
-
-                    <ul class="activity-list">
-
-
-                        {% for doc in recent_documents %}
-
-
-                            <li>
-
-
-                                <!-- Status ke according icon -->
-
-                                {% if doc.verification_status == 'Verified' %}
-
-                                    <span class="text-success">
-                                        &#9745;
-                                    </span>
-
-                                {% elif doc.verification_status == 'Issue Found' %}
-
-                                    <span class="text-danger">
-                                        &#9888;
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="text-warning">
-                                        &#8987;
-                                    </span>
-
-                                {% endif %}
-
-
-
-                                <div>
-
-                                    <strong>
-                                        {{ doc.document_name }}
-                                    </strong>
-
-
-                                    <span>
-
-                                        {% if doc.verification_status == 'Verified' %}
-
-                                            Document verified successfully.
-
-                                        {% elif doc.verification_status == 'Issue Found' %}
-
-                                            {{ doc.issue_description or 'Verification issue found.' }}
-
-                                        {% else %}
-
-                                            Verification pending.
-
-                                        {% endif %}
-
-                                    </span>
-
-                                </div>
-
-
-
-                                <!-- Database status -->
-
-                                {% if doc.verification_status == 'Verified' %}
-
-                                    <span class="badge-status success">
-                                        Verified
-                                    </span>
-
-                                {% elif doc.verification_status == 'Issue Found' %}
-
-                                    <span class="badge-status danger">
-                                        Issue Found
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="badge-status warning">
-                                        Pending
-                                    </span>
-
-                                {% endif %}
-
-
-                            </li>
-
-
-                        {% endfor %}
-
-
-                    </ul>
-
-
-                {% else %}
-
-
-                    <!-- Abhi document upload nahi hua -->
-
-                    <div class="text-muted">
-
-                        <p>
-                            No document activity yet.
+                        <p class="text-muted">
+                            Select a process and Personal Process Navigator
+                            will create your workflow automatically.
                         </p>
 
                         <a
-                            href="{{ url_for('upload') }}"
-                            class="btn btn-primary mt-3">
+                            href="{{ url_for('process') }}"
+                            class="btn btn-primary btn-full mt-3">
 
-                            Upload Document
+                            Start a Process &rarr;
 
                         </a>
 
                     </div>
 
-
-                {% endif %}
-
-
-            </div>
-
-
-        </div>
-
-
-
-        <!-- ================= NEXT ACTION ================= -->
-
-        <div>
-
-
-            <div class="card alert-highlight-card">
-
-
-                <div class="alert-header">
-
-                    <span class="text-warning">
-                        &#9888;
-                    </span>
-
-                    <h3>
-                        Next Action Required
-                    </h3>
-
-                </div>
-
-
-
-                {% if next_action %}
-
-
-                    <h4>
-                        {{ next_action.title }}
-                    </h4>
-
-
-                    <p class="issue-box">
-
-                        <strong>
-                            Action:
-                        </strong>
-
-                        {{ next_action.description }}
-
-                    </p>
-
-
-                    {% if next_action.process_name %}
-
-                        <p>
-                            <strong>Process:</strong>
-                            {{ next_action.process_name }}
-                        </p>
-
-                    {% endif %}
-
-
-                    {% if next_action.step_number %}
-
-                        <p>
-                            <strong>Step:</strong>
-                            {{ next_action.step_number }}
-                        </p>
-
-                    {% endif %}
-
-
-                    <a
-                        href="{{ url_for(
-                            'process_detail',
-                            process_id=next_action.process_id
-                        ) }}"
-                        class="btn btn-warning btn-full mt-4">
-
-                        Continue Process
-
-                    </a>
-
-
-                {% else %}
-
-
-                    <!-- Jab koi pending action nahi hai -->
-
-                    <h4>
-                        No Pending Action
-                    </h4>
-
-                    <p class="issue-box">
-
-                        You currently don't have any pending action.
-                        Start a process to see your next step here.
-
-                    </p>
-
-
-                    <a
-                        href="{{ url_for('process') }}"
-                        class="btn btn-primary btn-full mt-4">
-
-                        Explore Processes
-
-                    </a>
-
-
                 {% endif %}
 
 
@@ -656,12 +705,7 @@
 
         </div>
 
-
-    </div>
-
-
-</main>
-```
+    </main>
 
 </div>
 

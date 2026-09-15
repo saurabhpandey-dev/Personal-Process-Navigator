@@ -17,16 +17,13 @@
                 <!-- Process Description Dynamic -->
                 <p>{{ process.description }}</p>
             </div>
-            <div class="detail-action-box">
-                <a href="/upload" class="btn btn-primary btn-lg">Upload First Document &rarr;</a>
-            </div>
         </div>
 
         <div class="detail-content-grid mt-4">
             <!-- Left Column: Checklist & Steps -->
             <div class="space-y">
                 <!-- Required Documents Checklist -->
-                <div class="card">
+                <div class="card" id="checklist-section">
                     <h3>&#128194; Required Documents Checklist</h3>
                     <p class="text-muted text-sm mb-3">Ensure you have digital copies ready in PDF, JPG, or PNG format.</p>
                     
@@ -65,8 +62,11 @@
                                 {% endif %}
 
                                 <!-- Upload / Replace Form -->
-                                <form action="{{ url_for('upload_vault_doc') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                                <form class="ajax-upload-form" action="{{ url_for('upload_vault_doc') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center; margin-top: 5px;">
+                                    <!-- Yeh dono hidden inputs zaroori hain taaki app.py mein process_name aur document_type sahi se mile -->
+                                    <input type="hidden" name="process_name" value="{{ process.name }}">
                                     <input type="hidden" name="document_type" value="{{ req.document_name }}">
+                                    
                                     <input type="file" name="document_file" class="form-control" style="font-size: 0.9rem;" {% if not user_doc %}required{% endif %}>
                                     <button class="btn btn-primary" type="submit" style="white-space: nowrap; padding: 6px 14px; font-size: 0.9rem;">
                                         {% if user_doc %} Replace File {% else %} Upload File {% endif %}
@@ -77,7 +77,7 @@
                     </ul>
                 </div>
 
-                <!-- Step-by-Step Timeline (Aap ise bhi dynamic ya general rakh sakte hain) -->
+                <!-- Step-by-Step Process Timeline -->
                 <div class="card">
                     <h3>&#128200; Step-by-Step Process Timeline</h3>
                     <div class="timeline-container mt-4">
@@ -122,7 +122,7 @@
                 <div class="card">
                     <h3>Ready to proceed?</h3>
                     <p class="text-muted text-sm mb-4">Upload your documents one by one to complete this process.</p>
-                    <a href="/upload" class="btn btn-primary btn-full">Proceed to Upload &rarr;</a>
+                    <div class="space-y"><a href="/procced" class="btn btn-primary">Procced</a></div>
                     <a href="/process" class="btn btn-outline btn-full mt-3">Back to All Processes</a>
                 </div>
             </div>

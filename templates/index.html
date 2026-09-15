@@ -1,249 +1,867 @@
 {% extends "layout.html" %}
+
 {% block title %}Personal Process Navigator - Home{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<!-- this is front and first look section -->
+
+<!-- =========================================================
+     HERO SECTION
+     ========================================================= -->
+
 <section class="hero-section">
+
     <div class="hero-container">
+
         <div class="hero-content">
+
             <div class="badge-pill">
-                <span class="badge-dot"></span> Next-Gen AI Document Verification
+                <span class="badge-dot"></span>
+                AI-Powered Process & Document Guidance
             </div>
-            {% if session.get('email') %}
-                <h2>Ready to simplify your next process?</h2>
-                 <p>Join thousands of students and applicants who navigate paperwork seamlessly.</p>
-                <a href="/dashboard" class="btn btn-primary btn-lg">Go to Dashboard</a>
-            {% else %}
-                <h1>Navigate Every Process With <span>Confidence.</span></h1>
-                <p>Understand requirements, verify your documents, get AI-powered guidance, and track your application journey from start to finish.</p>
+
+
+            {% if session.get('user_id') or session.get('email') %}
+
+                <h1>
+                    Welcome Back,
+                    <span>
+                        {{ user.name.split()[0] if user and user.name else 'User' }}.
+                    </span>
+                </h1>
+
+                <p>
+                    Continue your process, manage documents,
+                    verify requirements and track your progress
+                    from one place.
+                </p>
+
                 <div class="hero-buttons">
-                    <a href="/register" class="btn btn-primary btn-lg">Get Started &rarr;</a>
-                    <a href="/process" class="btn btn-outline btn-lg">Explore Processes</a>
+
+                    <a
+                        href="{{ url_for('dashboard') }}"
+                        class="btn btn-primary btn-lg">
+
+                        Go to Dashboard &rarr;
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('process') }}"
+                        class="btn btn-outline btn-lg">
+
+                        Explore Processes
+
+                    </a>
+
                 </div>
+
+            {% else %}
+
+                <h1>
+                    Navigate Every Process
+                    <span>With Confidence.</span>
+                </h1>
+
+                <p>
+                    Understand requirements, organize documents,
+                    get AI-powered guidance and track your process
+                    step-by-step from one place.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a
+                        href="{{ url_for('register') }}"
+                        class="btn btn-primary btn-lg">
+
+                        Get Started &rarr;
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('process') }}"
+                        class="btn btn-outline btn-lg">
+
+                        Explore Processes
+
+                    </a>
+
+                </div>
+
             {% endif %}
+
         </div>
-        
-        <!-- Right-side CSS-only product/dashboard illustration -->
+
+
+
+        <!-- =====================================================
+             PRODUCT MOCKUP
+             ===================================================== -->
+
         <div class="hero-illustration">
+
             <div class="mockup-window">
+
                 <div class="mockup-header">
+
                     <span class="dot red"></span>
                     <span class="dot yellow"></span>
                     <span class="dot green"></span>
-                    <span class="mockup-title">Navigator AI core</span>
+
+                    <span class="mockup-title">
+                        Process Navigator AI
+                    </span>
+
                 </div>
+
+
                 <div class="mockup-body">
+
+
+                    <!-- Document Verification -->
+
                     <div class="mockup-card highlight-card">
+
                         <div class="card-icon-title">
-                            <span class="icon-box text-accent">&#128737;</span>
+
+                            <span class="icon-box text-accent">
+                                &#128737;
+                            </span>
+
                             <div>
-                                <h4>Document Verification</h4>
-                                <p>Aadhaar & Income Cert Scanned</p>
+
+                                <h4>
+                                    Document Verification
+                                </h4>
+
+                                <p>
+                                    Document status
+                                </p>
+
                             </div>
+
                         </div>
-                        <span class="status-badge success">Verified (98%)</span>
+
+                        <span class="status-badge success">
+                            Ready
+                        </span>
+
                     </div>
+
+
+
+                    <!-- Process Progress -->
 
                     <div class="mockup-progress-box">
+
                         <div class="progress-info">
-                            <span>Education Loan Application</span>
-                            <strong>65%</strong>
+
+                            <span>
+                                Process Progress
+                            </span>
+
+                            <strong>
+                                Tracking
+                            </strong>
+
                         </div>
+
                         <div class="progress-track">
-                            <div class="progress-fill" style="width: 65%;"></div>
+
+                            <div
+                                class="progress-fill"
+                                style="width: 65%;">
+                            </div>
+
                         </div>
+
                     </div>
+
+
+
+                    <!-- AI Guidance -->
 
                     <div class="mockup-alert">
-                        <span class="icon-box">&#129302;</span>
+
+                        <span class="icon-box">
+                            &#129302;
+                        </span>
+
                         <div>
-                            <strong>AI Assistant Guidance</strong>
-                            <p>No discrepancy found in identity proofs. Ready for bank submission.</p>
+
+                            <strong>
+                                AI Guidance
+                            </strong>
+
+                            <p>
+                                Review document requirements
+                                and follow the recommended next step.
+                            </p>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </section>
 
-<!-- Trusted / Stats Section -->
-{% if session.get('email') %}
-    <section class="stats-section">
-        <div class="container stats-grid">
-            <div class="stat-card">
-                <h3>00+</h3>
-                <p>Supported Processes</p>
-            </div>
-            <div class="stat-card">
-                <h3>Instant</h3>
-                <p>AI-Powered Guidance</p>
-            </div>
-            <div class="stat-card">
-                <h3>99.0%</h3>
-                <p>Document Verification Accuracy</p>
-            </div>
-            <div class="stat-card">
-                <h3>End-to-End</h3>
-                <p>Step-by-Step Tracking</p>
-            </div>
-        </div>
-    </section>
-{%endif%}
 
-<!-- Popular Processes Section -->
+
+<!-- =========================================================
+     QUICK STATS
+     ========================================================= -->
+
+<section class="stats-section">
+
+    <div class="container stats-grid">
+
+
+        <div class="stat-card">
+
+            <h3>
+                {{ processes|length if processes else 0 }}
+            </h3>
+
+            <p>
+                Available Processes
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                AI
+            </h3>
+
+            <p>
+                Assisted Guidance
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                OCR
+            </h3>
+
+            <p>
+                Document Analysis
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                1
+            </h3>
+
+            <p>
+                Unified Process Dashboard
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     POPULAR PROCESSES
+     ========================================================= -->
+
 <section id="processes" class="processes-section">
+
     <div class="container">
+
         <div class="section-header">
-            <h2>Start With What You Need</h2>
-            <p>Select from our core verified process workflows tailored for students and entrepreneurs.</p>
+
+            <h2>
+                Start With What You Need
+            </h2>
+
+            <p>
+                Select a process and follow its requirements,
+                documents and workflow step-by-step.
+            </p>
+
         </div>
+
+
         <div class="process-grid">
-            <div class="process-card">
-                <div class="process-icon bg-blue-soft">&#127891;</div>
-                <h3>Education Loan</h3>
-                <p>Complete documentation checklist and bank verification guidance for domestic & international studies.</p>
-                <div class="doc-count">&#128194; 6 Required Documents</div>
-                <a href="/dashboard" class="btn btn-outline btn-full">View Process</a>
-            </div>
-            <div class="process-card">
-                <div class="process-icon bg-cyan-soft">&#127942;</div>
-                <h3>Scholarship</h3>
-                <p>Navigate merit and need-based government or private scholarship applications effortlessly.</p>
-                <div class="doc-count">&#128194; 4 Required Documents</div>
-                <a href="/dashboard" class="btn btn-outline btn-full">View Process</a>
-            </div>
-            <div class="process-card">
-                <div class="process-icon bg-green-soft">&#128181;</div>
-                <h3>GST Registration</h3>
-                <p>Seamless tax identification setup workflow with automated business proof verification.</p>
-                <div class="doc-count">&#128194; 5 Required Documents</div>
-                <a href="/dashboard" class="btn btn-outline btn-full">View Process</a>
-            </div>
-            <div class="process-card">
-                <div class="process-icon bg-purple-soft">&#127970;</div>
-                <h3>Company Registration</h3>
-                <p>Incorporate your startup, LLP, or private limited entity with structured compliance tracking.</p>
-                <div class="doc-count">&#128194; 8 Required Documents</div>
-                <a href="/dashboard" class="btn btn-outline btn-full">View Process</a>
-            </div>
+
+
+            {% if processes %}
+
+
+                {% for p in processes %}
+
+                    <div class="process-card">
+
+
+                        <!-- Process Icon -->
+
+                        <div class="process-icon bg-blue-soft">
+
+                            {% if p.category == 'Education' %}
+
+                                &#127891;
+
+                            {% elif p.category == 'Finance' %}
+
+                                &#128176;
+
+                            {% elif p.category == 'Business' %}
+
+                                &#127970;
+
+                            {% elif p.category == 'Government' %}
+
+                                &#127963;
+
+                            {% else %}
+
+                                &#128196;
+
+                            {% endif %}
+
+                        </div>
+
+
+
+                        <h3>
+                            {{ p.name }}
+                        </h3>
+
+
+
+                        <p>
+
+                            {{ p.description
+                               or 'Follow the guided workflow, required documents and process steps.'
+                            }}
+
+                        </p>
+
+
+
+                        <!-- Dynamic category -->
+
+                        {% if p.category %}
+
+                            <div class="doc-count">
+
+                                &#128203;
+
+                                {{ p.category }}
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- Dynamic process -->
+
+                        <a
+                            href="{{ url_for(
+                                'process_detail',
+                                process_id=p.id
+                            ) }}"
+                            class="btn btn-outline btn-full">
+
+                            View Process &rarr;
+
+                        </a>
+
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <!-- No process available -->
+
+                <div class="card">
+
+                    <h3>
+                        No Processes Available
+                    </h3>
+
+                    <p class="text-muted">
+                        Processes will appear here once they are
+                        added to the system.
+                    </p>
+
+                </div>
+
+
+            {% endif %}
+
+
         </div>
+
+
     </div>
+
 </section>
 
-<!-- How It Works Section -->
+
+
+<!-- =========================================================
+     HOW IT WORKS
+     ========================================================= -->
+
 <section id="how-it-works" class="workflow-section">
+
     <div class="container">
+
         <div class="section-header">
-            <h2>How It Works</h2>
-            <p>A streamlined 5-step intelligent protocol designed to eliminate administrative confusion.</p>
+
+            <h2>
+                How It Works
+            </h2>
+
+            <p>
+                A simple workflow to understand, prepare and track
+                your administrative process.
+            </p>
+
         </div>
+
+
         <div class="workflow-steps">
+
+
             <div class="step-card">
-                <span class="step-number">01</span>
-                <h4>Select Your Process</h4>
-                <p>Choose your target registration or loan scheme from our verified library.</p>
+
+                <span class="step-number">
+                    01
+                </span>
+
+                <h4>
+                    Select Your Process
+                </h4>
+
+                <p>
+                    Choose the registration, application or
+                    administrative process you want to complete.
+                </p>
+
             </div>
+
+
+
             <div class="step-card">
-                <span class="step-number">02</span>
-                <h4>View Requirements</h4>
-                <p>Inspect exact file formats, mandatory certificates, and prerequisites.</p>
+
+                <span class="step-number">
+                    02
+                </span>
+
+                <h4>
+                    View Requirements
+                </h4>
+
+                <p>
+                    Check the documents and steps required
+                    for the selected process.
+                </p>
+
             </div>
+
+
+
             <div class="step-card">
-                <span class="step-number">03</span>
-                <h4>Upload Documents</h4>
-                <p>Securely upload PDFs or high-resolution scans into the secure vault.</p>
+
+                <span class="step-number">
+                    03
+                </span>
+
+                <h4>
+                    Upload Documents
+                </h4>
+
+                <p>
+                    Submit the required documents through
+                    the process workflow.
+                </p>
+
             </div>
+
+
+
             <div class="step-card">
-                <span class="step-number">04</span>
-                <h4>Verify & Get Guidance</h4>
-                <p>OCR engine extracts data and flags discrepancies instantly.</p>
+
+                <span class="step-number">
+                    04
+                </span>
+
+                <h4>
+                    Verify & Get Guidance
+                </h4>
+
+                <p>
+                    Document analysis and AI guidance can help
+                    identify possible issues and corrections.
+                </p>
+
             </div>
+
+
+
             <div class="step-card">
-                <span class="step-number">05</span>
-                <h4>Track Your Progress</h4>
-                <p>Monitor live submission statuses and clear pending actions easily.</p>
+
+                <span class="step-number">
+                    05
+                </span>
+
+                <h4>
+                    Track Your Progress
+                </h4>
+
+                <p>
+                    Monitor completed steps and identify
+                    the next action in your workflow.
+                </p>
+
             </div>
+
+
         </div>
+
     </div>
+
 </section>
 
-<!-- Features Section -->
+
+
+<!-- =========================================================
+     FEATURES
+     ========================================================= -->
+
 <section id="features" class="features-section">
+
     <div class="container">
+
         <div class="section-header">
-            <h2>Engineered For Precision</h2>
-            <p>Advanced modules built to solve real documentation bottlenecks.</p>
+
+            <h2>
+                Built For Simpler Processes
+            </h2>
+
+            <p>
+                Everything is organized around one goal:
+                reducing confusion while completing paperwork.
+            </p>
+
         </div>
+
+
         <div class="features-grid">
+
+
             <div class="feature-item">
-                <span class="feature-emoji">&#129504;</span>
-                <h3>Smart Process Guidance</h3>
-                <p>Context-aware logic guides you through complex government and institutional hurdles.</p>
+
+                <span class="feature-emoji">
+                    &#129504;
+                </span>
+
+                <h3>
+                    Smart Process Guidance
+                </h3>
+
+                <p>
+                    Get contextual guidance based on the
+                    process you are working on.
+                </p>
+
             </div>
+
+
+
             <div class="feature-item">
-                <span class="feature-emoji">&#9745;</span>
-                <h3>Document Checklist</h3>
-                <p>Dynamic requirement lists that adapt based on your specific demographic input.</p>
+
+                <span class="feature-emoji">
+                    &#9745;
+                </span>
+
+                <h3>
+                    Document Checklist
+                </h3>
+
+                <p>
+                    View the required documents associated
+                    with your selected process.
+                </p>
+
             </div>
+
+
+
             <div class="feature-item">
-                <span class="feature-emoji">&#10024;</span>
-                <h3>OCR-Based Extraction</h3>
-                <p>High-speed text extraction reads data directly from uploaded certificates.</p>
+
+                <span class="feature-emoji">
+                    &#10024;
+                </span>
+
+                <h3>
+                    OCR-Based Extraction
+                </h3>
+
+                <p>
+                    Extract useful text information from
+                    supported uploaded documents.
+                </p>
+
             </div>
+
+
+
             <div class="feature-item">
-                <span class="feature-emoji">&#128737;</span>
-                <h3>Document Verification</h3>
-                <p>Cross-references values to ensure absolute accuracy prior to submission.</p>
+
+                <span class="feature-emoji">
+                    &#128737;
+                </span>
+
+                <h3>
+                    Document Verification
+                </h3>
+
+                <p>
+                    Check uploaded documents and record
+                    their verification status.
+                </p>
+
             </div>
+
+
+
             <div class="feature-item">
-                <span class="feature-emoji">&#9888;</span>
-                <h3>AI Correction Guidance</h3>
-                <p>Receive actionable step-by-step fixes when mismatches or errors occur.</p>
+
+                <span class="feature-emoji">
+                    &#9888;
+                </span>
+
+                <h3>
+                    AI Correction Guidance
+                </h3>
+
+                <p>
+                    Receive understandable guidance when
+                    a possible document issue is detected.
+                </p>
+
             </div>
+
+
+
             <div class="feature-item">
-                <span class="feature-emoji">&#128200;</span>
-                <h3>Process Tracking</h3>
-                <p>Real-time visual progress bars keeping you informed at every milestone.</p>
+
+                <span class="feature-emoji">
+                    &#128200;
+                </span>
+
+                <h3>
+                    Process Tracking
+                </h3>
+
+                <p>
+                    Track completed and pending workflow
+                    steps through a visual progress system.
+                </p>
+
             </div>
+
+
         </div>
+
     </div>
+
 </section>
 
-<!-- AI Section -->
+
+
+<!-- =========================================================
+     AI SHOWCASE
+     ========================================================= -->
+
 <section class="ai-showcase-section">
+
     <div class="container ai-showcase-grid">
+
+
         <div class="ai-text-content">
-            <span class="badge-pill">Intelligent Assistance</span>
-            <h2>Your Personal Process Assistant</h2>
-            <p>Stuck with mismatched names, invalid formats, or missing endorsement stamps? Our contextual AI assistant diagnoses issues instantly and provides exact correction roadmaps.</p>
+
+            <span class="badge-pill">
+                Intelligent Assistance
+            </span>
+
+            <h2>
+                Your Personal Process Assistant
+            </h2>
+
+            <p>
+                When a document or process requirement creates
+                confusion, AI-powered guidance can help explain
+                the possible issue and suggest the next action.
+            </p>
+
+
             <div class="ai-cta-box">
-                <a href="/register" class="btn btn-primary">Try Process Navigator &rsaquo;</a>
+
+                {% if session.get('user_id') or session.get('email') %}
+
+                    <a
+                        href="{{ url_for('dashboard') }}"
+                        class="btn btn-primary">
+
+                        Open Dashboard &rsaquo;
+
+                    </a>
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for('register') }}"
+                        class="btn btn-primary">
+
+                        Try Process Navigator &rsaquo;
+
+                    </a>
+
+                {% endif %}
+
             </div>
+
         </div>
+
+
+
+        <!-- AI CHAT MOCKUP -->
+
         <div class="ai-chat-mockup">
+
+
             <div class="chat-header">
-                <span>&#129302;</span> Process Navigator AI Core
+
+                <span>
+                    &#129302;
+                </span>
+
+                Process Navigator AI
+
             </div>
+
+
+
             <div class="chat-body">
+
+
                 <div class="chat-bubble user">
-                    "My name is different on my identity proof and certificate. What should I do?"
+
+                    "My name is different on my identity proof
+                    and certificate. What should I do?"
+
                 </div>
+
+
+
                 <div class="chat-bubble ai">
-                    <span>&#10024;</span> We found a possible name mismatch. Review the document details and follow the recommended correction steps (affidavit verification or name normalization).
+
+                    <span>
+                        &#10024;
+                    </span>
+
+                    A possible name mismatch may require
+                    document correction or supporting proof.
+                    Review the affected documents and follow
+                    the recommended correction steps.
+
                 </div>
+
+
             </div>
+
         </div>
+
+
     </div>
+
 </section>
 
-<!-- Final CTA -->
+
+
+<!-- =========================================================
+     FINAL CTA
+     ========================================================= -->
+
 <section class="final-cta-section">
+
     <div class="container text-center">
-        <h2>Ready to simplify your next process?</h2>
-        <p>Join thousands of students and applicants who navigate paperwork seamlessly.</p>
-        <a href="/register" class="btn btn-primary btn-lg">Get Started Now</a>
+
+
+        {% if session.get('user_id') or session.get('email') %}
+
+            <h2>
+                Continue Your Process
+            </h2>
+
+            <p>
+                Open your dashboard and continue from
+                your current workflow step.
+            </p>
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="btn btn-primary btn-lg">
+
+                Go To Dashboard &rarr;
+
+            </a>
+
+        {% else %}
+
+            <h2>
+                Ready to simplify your next process?
+            </h2>
+
+            <p>
+                Create your account and start organizing
+                your process journey.
+            </p>
+
+            <a
+                href="{{ url_for('register') }}"
+                class="btn btn-primary btn-lg">
+
+                Get Started Now &rarr;
+
+            </a>
+
+        {% endif %}
+
+
     </div>
+
 </section>
+
+
 {% endblock %}

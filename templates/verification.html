@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% block title %}Verification Result - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<section class="result-page-section">
+    <div class="container result-container">
+        <!-- Result Header Status Card: Issue Found Example -->
+        <div class="card result-status-card danger-theme">
+            <div class="result-status-header">
+                <div class="status-icon-box danger">&#9888;</div>
+                <div>
+                    <span class="badge-status danger">Verification Status</span>
+                    <h2>Issue Found</h2>
+                    <p>Our verification engine detected a discrepancy in the uploaded certificate.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-grid mt-4">
+            <!-- Left: Document Details & Extracted Info -->
+            <div class="card">
+                <h3>Document Details</h3>
+                <div class="detail-row-list mt-3">
+                    <div class="detail-row">
+                        <span class="text-muted">Document Name:</span>
+                        <strong>Income Certificate</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span class="text-muted">Associated Process:</span>
+                        <strong>Education Loan</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span class="text-muted">Extracted Name:</span>
+                        <strong class="text-danger">J. Kumar</strong> <small class="text-muted">(Differs from profile: John Kumar)</small>
+                    </div>
+                    <div class="detail-row">
+                        <span class="text-muted">Issue Description:</span>
+                        <span class="text-warning font-semibold">Name on document does not match the submitted information.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Correction Guidance -->
+            <div class="card alert-highlight-card">
+                <div class="alert-icon-header">
+                    <span class="text-warning">&#9888;</span>
+                    <h3>Correction Guidance</h3>
+                </div>
+                <p class="text-sm text-muted mb-3">Follow these recommended steps to resolve the discrepancy before proceeding:</p>
+                <ol class="correction-steps-list">
+                    <li>Check the document for abbreviation errors or spelling mismatches.</li>
+                    <li>Obtain an endorsement or affidavit if name variation exists legally.</li>
+                    <li>Re-scan or upload the corrected certificate with clear signatures.</li>
+                </ol>
+                <div class="action-buttons-group mt-4">
+                    <a href="{{ url_for('upload_document') }}" class="btn btn-warning btn-full">Re-Upload Document</a>
+                    <a href="{{ url_for('tracking') }}" class="btn btn-outline btn-full mt-2">View Process Tracking</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

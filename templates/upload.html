@@ -7,25 +7,31 @@
         <div class="section-header text-center">
             <span class="badge-pill">Secure Vault Upload</span>
             <h2>Upload Your Document</h2>
-            <p>Upload digital copies of your certificates for instant OCR verification.</p>
+            <p>Upload digital copies of your certificates for instant verification.</p>
         </div>
 
         <div class="card upload-card-box">
             <div class="upload-meta-bar">
                 <div>
                     <span class="text-muted text-xs">Active Process</span>
-                    <h4>Education Loan</h4>
+                    <!-- Dynamic Process Name -->
+                    <h4>{{ process_name }}</h4>
                 </div>
                 <div>
                     <span class="text-muted text-xs">Document Type</span>
-                    <h4 class="text-accent">Income Certificate</h4>
+                    <!-- Dynamic Document Type -->
+                    <h4 class="text-accent">{{ document_type }}</h4>
                 </div>
                 <div>
                     <span class="badge-status success">Required</span>
                 </div>
             </div>
 
-            <form method="POST" action="/verification" enctype="multipart/form-data" class="upload-form mt-4" id="uploadForm">
+            <form method="POST" action="/upload_vault_doc" enctype="multipart/form-data" class="upload-form mt-4" id="uploadForm">
+                
+                <!-- Hidden input jo backend ko document type bhejega -->
+                <input type="hidden" name="document_type" value="{{ document_type }}">
+
                 <div class="dropzone-area" id="dropZone">
                     <div class="dropzone-content" id="dropContent">
                         <span class="upload-icon">&#128194;</span>
@@ -33,7 +39,9 @@
                         <p>Supports: PDF, JPG, JPEG, PNG (Max file size: 10MB)</p>
                         <label for="fileInput" class="btn btn-outline btn-sm mt-3">Browse Files</label>
                     </div>
-                    <input type="file" id="fileInput" name="document" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    
+                    <!-- Dhyan dein: name 'document_file' hona chahiye jo app.py se match kare -->
+                    <input type="file" id="fileInput" name="document_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
                     
                     <!-- File Preview State (Hidden by default) -->
                     <div class="file-preview-box" id="filePreview" style="display: none;">

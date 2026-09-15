@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block title %}Process Tracking - Personal Process Navigator{% endblock %}
+
+{% block content %}
+<section class="tracking-page-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="badge-pill">Live Application Journey</span>
+            <h2>Education Loan Tracking</h2>
+            <p>Monitor your active submission milestones and immediate pending actions.</p>
+        </div>
+
+        <!-- Overall Progress Card -->
+        <div class="card continue-card mb-4">
+            <div class="continue-info">
+                <h3>Overall Progress</h3>
+                <p><strong>Current Milestone:</strong> Document Verification (Issue Detected)</p>
+                <div class="progress-track mt-3">
+                    <div class="progress-fill" style="width: 65%;"></div>
+                </div>
+                <span class="progress-text">65% Completed</span>
+            </div>
+            <div>
+                <a href="{{ url_for('upload_document') }}" class="btn btn-primary">Resolve Issue &rarr;</a>
+            </div>
+        </div>
+
+        <div class="tracking-grid">
+            <!-- Left: Timeline milestones -->
+            <div class="card">
+                <h3>Milestone Timeline</h3>
+                <div class="timeline-container mt-4">
+                    <div class="timeline-step completed">
+                        <span class="timeline-marker">&#10003;</span>
+                        <div class="timeline-info">
+                            <strong>Eligibility Check</strong>
+                            <span class="text-success text-xs">Completed</span>
+                        </div>
+                    </div>
+                    <div class="timeline-step completed">
+                        <span class="timeline-marker">&#10003;</span>
+                        <div class="timeline-info">
+                            <strong>Document Collection</strong>
+                            <span class="text-success text-xs">Completed</span>
+                        </div>
+                    </div>
+                    <div class="timeline-step current">
+                        <span class="timeline-marker">&#8594;</span>
+                        <div class="timeline-info">
+                            <strong>Document Verification</strong>
+                            <span class="text-warning text-xs">Action Required (Issue Found)</span>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <span class="timeline-marker">&#9675;</span>
+                        <div class="timeline-info">
+                            <strong>Application Preparation</strong>
+                            <span class="text-muted text-xs">Pending</span>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <span class="timeline-marker">&#9675;</span>
+                        <div class="timeline-info">
+                            <strong>Application Submission</strong>
+                            <span class="text-muted text-xs">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Next Action Card -->
+            <div class="space-y">
+                <div class="card alert-highlight-card">
+                    <div class="alert-icon-header">
+                        <span class="text-warning">&#9888;</span>
+                        <h3>Next Action Required</h3>
+                    </div>
+                    <h4>Your Income Certificate needs attention.</h4>
+                    <p class="text-sm text-muted mb-3">Name mismatch detected between ID proof and certificate upload.</p>
+                    <a href="{{ url_for('verification_result') }}" class="btn btn-warning btn-full">View Guidance</a>
+                </div>
+
+                <div class="card">
+                    <h3>Support & Assistance</h3>
+                    <p class="text-sm text-muted mb-3">Need help with document clearance or verification rules?</p>
+                    <a href="#" class="btn btn-outline btn-full">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

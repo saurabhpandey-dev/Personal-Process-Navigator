@@ -25,7 +25,7 @@ db = SQL(f'sqlite:///{db_path}')  # database add command
 # client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6K5ETs2u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw"))
 # Line 25 ki jagah ye likhein:
 # client = genai.Client(api_key="AQ.Ab8RN6K5ETs2#u5kUlHsV0WRAr-RAgDBwGPbBcoEKds5gI0lHpw")
-client = genai.Client(api_key="AQ.Ab8RN6IJnIX5xueO6ckdoPYPfX2I5MbNyen8liNtD2RJ3zxzsg")
+client = genai.Client(api_key=os.environ.get("AQ.Ab8RN6IJnIX5xueO6ckdoPYPfX2I5MbNyen8liNtD2RJ3zxzsg"))
 
 @app.route('/')
 def index():

@@ -880,7 +880,7 @@ def search_or_create_process():
 
     # Create user's process instance
     user_process_id = create_user_process(
-        user_id,
+        u_id,
         new_process_id
     )
 
